@@ -1,15 +1,19 @@
-/*@import "tailwindcss";*/
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 :root {
   --color-black: #020202;
+  --color-white: #F9F9F9;
+  --color-navbar: #DEC18C;
   --font-primary: 'Jost';
   --font-secondary: 'Handlee';
 }
 
 body {
+  background-color: var(--color-white);
   color: var(--color-black);
-  font-family: var(--font-primary), Arial, Helvetica, sans-serif;
+  font-family: var(--font-primary), 'trebuchet ms', sans-serif;
+}
+
+nav.navbar {
+  background-color: var(--color-navbar);
 }

@@ -17,3 +17,11 @@ body {
 nav.navbar {
   background-color: var(--color-navbar);
 }
+
+.font-secondary {
+  font-family: var(--font-secondary), cursive;
+}
+
+.border-primary {
+  border-color: var(--color-navbar);
+}

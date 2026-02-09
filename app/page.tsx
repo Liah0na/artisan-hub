@@ -7,8 +7,6 @@ export default function Home() {
     <>
       <Header />
       <Hero />
-      <h1>Welcome to Artisan Hub</h1>
-      <p>Your one-stop platform for artisan crafts. The future is this <b>Ship</b>.</p>
       <Products />
     </>
   );

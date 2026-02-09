@@ -1,9 +1,21 @@
-import Image from "next/image";
+import Image from 'next/image';
 
-const CardProduct = () => {
+type CardProductProps = {
+  imageSrc?: string;
+  altText?: string; 
+  title?: string;
+  description?: string;
+};
+
+const CardProduct = ({
+  imageSrc = '/default.jpg',
+  altText = 'Producto artesanal',
+  title = 'Producto artesanal',
+  description = 'Hecho a mano en Brasil',
+}: CardProductProps) => {
   return (
     <article
-      className="group relative rounded-2xl border border-black/10 bg-white p-4
+      className="group relative rounded-2xl border border-primary bg-white p-2
             transition-all duration-300 ease-out
             hover:-translate-y-1
             hover:shadow-[0_10px_30px_rgba(0,0,0,0.08)]
@@ -12,8 +24,8 @@ const CardProduct = () => {
       {/*<!-- Imagen -->*/}
       <div className="relative h-48 w-full overflow-hidden rounded-xl bg-gray-100">
         <Image
-          src="/default.jpg"
-          alt="Producto artesanal"
+          src={imageSrc}
+          alt={altText}
           className="h-full w-full object-cover
                 transition-transform duration-500 ease-out
                 group-hover:scale-105"
@@ -28,11 +40,11 @@ const CardProduct = () => {
                 transition-colors duration-300
                 group-hover:text-black"
         >
-          Producto artesanal
+          {title}
         </h3>
 
         <p className="mt-1 text-sm text-black/60">
-          Hecho a mano en Brasil
+          {description}
         </p>
       </div>
 
@@ -52,7 +64,7 @@ const CardProduct = () => {
             stroke-width="2"
             viewBox="0 0 24 24"
           >
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
           </svg>
         </span>
       </div>

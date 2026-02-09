@@ -10,13 +10,36 @@ const Products = () => {
 
         <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
           
-          <article className="rounded-xl border border-primary p-2">
-            <div className="h-48 w-full bg-gray-200 rounded-lg mb-4"></div>
-            <h3 className="text-lg font-medium">Producto 1</h3>
-            <p className="text-sm text-gray-600">Descripción corta</p>
-          </article>
-          {/*-- Repite 8 veces --*/}
           <CardProduct />
+          <CardProduct
+            imageSrc="/dolls.jpg"
+            title="Otro producto artesanal"
+          />
+          <CardProduct
+            imageSrc="/painting.jpg"
+            title="Pintura al óleo"
+          />
+          <CardProduct
+            imageSrc="/carlabron.jpg"
+            title="Pintura al óleo"
+          />
+          <CardProduct
+            imageSrc="/wood.jpg"
+            title="Pintura al óleo"
+          />
+          <CardProduct
+            imageSrc="/notebook.jpg"
+            title="Pintura al óleo"
+          />
+          <CardProduct
+            imageSrc="/mandala.jpg"
+            title="Lorem ipsum dolor sit amet"
+          />
+          <CardProduct
+            imageSrc="/street-art.jpg"
+            title="Consectetur adipiscing elit"
+          />
+
         </div>
 
       </div>

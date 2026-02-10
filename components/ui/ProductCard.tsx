@@ -1,18 +1,18 @@
 import Image from 'next/image';
 
-type CardProductProps = {
+type ProductCardProps = {
   imageSrc?: string;
   altText?: string; 
   title?: string;
   description?: string;
 };
 
-const CardProduct = ({
+const ProductCard = ({
   imageSrc = '/default.jpg',
   altText = 'Producto artesanal',
   title = 'Producto artesanal',
   description = 'Hecho a mano en Brasil',
-}: CardProductProps) => {
+}: ProductCardProps) => {
   return (
     <article
       className="group relative rounded-2xl border border-primary bg-white p-2
@@ -21,7 +21,6 @@ const CardProduct = ({
             hover:shadow-[0_10px_30px_rgba(0,0,0,0.08)]
             hover:border-black/20"
     >
-      {/*<!-- Imagen -->*/}
       <div className="relative h-48 w-full overflow-hidden rounded-xl bg-gray-100">
         <Image
           src={imageSrc}
@@ -33,7 +32,6 @@ const CardProduct = ({
         />
       </div>
 
-      {/*<!-- Contenido -->*/}
       <div className="mt-4">
         <h3
           className="text-lg font-medium tracking-tight
@@ -61,7 +59,7 @@ const CardProduct = ({
             className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1"
             fill="none"
             stroke="currentColor"
-            stroke-width="2"
+            strokeWidth="2"
             viewBox="0 0 24 24"
           >
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
@@ -72,4 +70,4 @@ const CardProduct = ({
   );
 };
 
-export default CardProduct;
+export default ProductCard;

@@ -19,9 +19,13 @@ nav.navbar {
 }
 
 .font-secondary {
-  font-family: var(--font-secondary), cursive;
+  font-family: var(--font-secondary), 'cursive';
 }
 
 .border-primary {
   border-color: var(--color-navbar);
+}
+
+.background-primary {
+  background-color: var(--color-navbar);
 }

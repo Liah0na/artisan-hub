@@ -1,6 +1,6 @@
-import CardProduct from "@/components/ui/CardProduct";
+import ProductCard from "@/components/ui/ProductCard";
 
-const Products = () => {
+const ProductsSection = () => {
   return (
     <section className="w-full py-16">
       <div className="mx-auto max-w-[1200px] px-4">
@@ -10,32 +10,32 @@ const Products = () => {
 
         <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
           
-          <CardProduct />
-          <CardProduct
+          <ProductCard />
+          <ProductCard
             imageSrc="/dolls.jpg"
             title="Otro producto artesanal"
           />
-          <CardProduct
+          <ProductCard
             imageSrc="/painting.jpg"
             title="Pintura al óleo"
           />
-          <CardProduct
+          <ProductCard
             imageSrc="/carlabron.jpg"
             title="Pintura al óleo"
           />
-          <CardProduct
+          <ProductCard
             imageSrc="/wood.jpg"
             title="Pintura al óleo"
           />
-          <CardProduct
+          <ProductCard
             imageSrc="/notebook.jpg"
             title="Pintura al óleo"
           />
-          <CardProduct
+          <ProductCard
             imageSrc="/mandala.jpg"
             title="Lorem ipsum dolor sit amet"
           />
-          <CardProduct
+          <ProductCard
             imageSrc="/street-art.jpg"
             title="Consectetur adipiscing elit"
           />
@@ -47,4 +47,4 @@ const Products = () => {
   );
 }
 
-export default Products;
+export default ProductsSection;

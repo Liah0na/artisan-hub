@@ -14,10 +14,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${jost.variable} ${handlee.variable}`}>
+    <html lang="en" className={`${jost.variable} ${handlee.variable}`} suppressHydrationWarning>
       <body>
         {children}
       </body>
     </html>
   );
 }
+ 

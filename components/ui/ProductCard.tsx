@@ -15,11 +15,9 @@ const ProductCard = ({
 }: ProductCardProps) => {
   return (
     <article
-      className="group relative rounded-2xl border border-primary bg-white p-2
+      className="group relative rounded-2xl bg-white
             transition-all duration-300 ease-out
-            hover:-translate-y-1
-            hover:shadow-[0_10px_30px_rgba(0,0,0,0.08)]
-            hover:border-black/20"
+            hover:-translate-y-1"
     >
       <div className="relative h-48 w-full overflow-hidden rounded-xl bg-gray-100">
         <Image

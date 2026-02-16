@@ -1,11 +1,19 @@
-import Image from "next/image";
+import ArtisansSection from '@/components/layout/landing-page/ArtisanSection';
+import Footer from '@/components/layout/landing-page/Footer';
+import Header from '@/components/layout/landing-page/Header';
+import Hero from '@/components/layout/landing-page/Hero';
+import News from '@/components/layout/landing-page/News';
+import ProductsSection from '@/components/layout/landing-page/ProductsSection';
 
 export default function Home() {
   return (
-    <div>
-      <Image src="/logo.png" alt="Artisan Hub Logo" width={349} height={78} />
-      <h1>Welcome to Artisan Hub</h1>
-      <p>Your one-stop platform for artisan crafts. The future is this <b>Ship</b>.</p>
-    </div>
+    <>
+      <Header />
+      <Hero />
+      <ProductsSection />
+      <News />
+      <ArtisansSection />
+      <Footer />
+    </>
   );
 }

@@ -12,9 +12,9 @@ const ArtisansSection = () => {
         </p>
       </header>
 
-      <div className="grid gap-8 md:grid-cols-3">
+      <div className="grid gap-8 md:grid-cols-4">
         <ArtisanCard
-          name="María Quispe"
+          name="Marcelino Torres"
           role="Ceramista"
           description="Especialista en cerámica tradicional andina, con más de 15 años de experiencia."
         />
@@ -27,6 +27,12 @@ const ArtisansSection = () => {
 
         <ArtisanCard
           name="Ana López"
+          role="Textil artesanal"
+          description="Trabaja con fibras naturales y técnicas ancestrales para crear tejidos únicos."
+        />
+
+        <ArtisanCard
+          name="Ana Kurniawan"
           role="Textil artesanal"
           description="Trabaja con fibras naturales y técnicas ancestrales para crear tejidos únicos."
         />

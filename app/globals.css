@@ -29,3 +29,11 @@ nav.navbar {
 .background-primary {
   background-color: var(--color-navbar);
 }
+
+.display-logo {
+  display: block;
+}
+
+.hidden-logo {
+  display: none;
+}

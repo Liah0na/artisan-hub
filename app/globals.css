@@ -30,6 +30,10 @@ nav.navbar {
   background-color: var(--color-navbar);
 }
 
+.hover\:hover-primary:hover {
+  color: var(--color-navbar);
+}
+
 .display-logo {
   display: block;
 }

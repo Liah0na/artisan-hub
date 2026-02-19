@@ -1,4 +1,5 @@
-import ProductCard from "@/components/ui/ProductCard";
+import { products } from '@/lib/data/products';
+import ProductCard from '@/components/ui/ProductCard';
 
 const ProductsSection = () => {
   return (
@@ -9,7 +10,15 @@ const ProductsSection = () => {
         </h2>
 
         <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-          
+          {
+            products.map((product) => (
+              <ProductCard
+                key={product.id}
+                product={product}
+              />
+            ))             
+          }
+          {/*}
           <ProductCard />
           <ProductCard
             imageSrc="/dolls.jpg"
@@ -38,7 +47,7 @@ const ProductsSection = () => {
           <ProductCard
             imageSrc="/street-art.jpg"
             title="Consectetur adipiscing elit"
-          />
+          />*/}
 
         </div>
 

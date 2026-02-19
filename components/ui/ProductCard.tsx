@@ -1,18 +1,10 @@
+import Link from 'next/link';
 import Image from 'next/image';
+import { Product } from '@/lib/types';
 
-type ProductCardProps = {
-  imageSrc?: string;
-  altText?: string; 
-  title?: string;
-  description?: string;
-};
+interface ProductCardProps { product: Product; }
 
-const ProductCard = ({
-  imageSrc = '/default.jpg',
-  altText = 'Producto artesanal',
-  title = 'Producto artesanal',
-  description = 'Hecho a mano en Brasil',
-}: ProductCardProps) => {
+const ProductCard = ({ product }: ProductCardProps) => {
   return (
     <article
       className="group relative rounded-2xl bg-white
@@ -21,8 +13,8 @@ const ProductCard = ({
     >
       <div className="relative h-48 w-full overflow-hidden rounded-xl bg-gray-100">
         <Image
-          src={imageSrc}
-          alt={altText}
+          src={product.image || '/default.jpg'}
+          alt={product.name}
           className="h-full w-full object-cover
                 transition-transform duration-500 ease-out
                 group-hover:scale-105"
@@ -36,16 +28,16 @@ const ProductCard = ({
                 transition-colors duration-300
                 group-hover:text-black"
         >
-          {title}
+          {product.name}
         </h3>
 
         <p className="mt-1 text-sm text-black/60">
-          {description}
+          {product.description}
         </p>
       </div>
 
-      {/*<!-- CTA sutil -->*/}
       <div className="mt-4">
+        <Link href={`/product/${product.id || 0}`} className="inline-flex items-center text-sm font-medium text-black/70">
         <span
           className="inline-flex items-center text-sm font-medium text-black/70
                 transition-all duration-300
@@ -63,6 +55,7 @@ const ProductCard = ({
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
           </svg>
         </span>
+        </Link>
       </div>
     </article>
   );

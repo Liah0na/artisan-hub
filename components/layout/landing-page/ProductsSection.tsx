@@ -18,37 +18,6 @@ const ProductsSection = () => {
               />
             ))             
           }
-          {/*}
-          <ProductCard />
-          <ProductCard
-            imageSrc="/dolls.jpg"
-            title="Otro producto artesanal"
-          />
-          <ProductCard
-            imageSrc="/painting.jpg"
-            title="Pintura al óleo"
-          />
-          <ProductCard
-            imageSrc="/carlabron.jpg"
-            title="Pintura al óleo"
-          />
-          <ProductCard
-            imageSrc="/wood.jpg"
-            title="Pintura al óleo"
-          />
-          <ProductCard
-            imageSrc="/notebook.jpg"
-            title="Pintura al óleo"
-          />
-          <ProductCard
-            imageSrc="/mandala.jpg"
-            title="Lorem ipsum dolor sit amet"
-          />
-          <ProductCard
-            imageSrc="/street-art.jpg"
-            title="Consectetur adipiscing elit"
-          />*/}
-
         </div>
 
       </div>

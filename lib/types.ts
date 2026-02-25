@@ -15,6 +15,7 @@ export type Gallery = {
 export type Product = {
   id: string;
   name: string;
+  mainImage: string;
   description: string;
   price: number;
   artisanId: string;

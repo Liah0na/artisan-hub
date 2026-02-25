@@ -5,6 +5,7 @@ export const products: Product[] = [
   {
     id: 'prod-001',
     name: 'Andean Ceramic Vase',
+    mainImage: '/alicja.jpg',
     description: 'Handcrafted ceramic vase with natural glaze.',
     price: 85,
     artisanId: 'artisan-001',
@@ -15,6 +16,7 @@ export const products: Product[] = [
   {
     id: 'prod-002',
     name: 'Decorative Clay Bowl',
+    mainImage: '/dolls.jpg',
     description: 'Minimalist clay bowl for modern interiors.',
     price: 60,
     artisanId: 'artisan-001',
@@ -27,6 +29,7 @@ export const products: Product[] = [
   {
     id: 'prod-003',
     name: 'Rustic Wooden Chair',
+    mainImage: '/carlabron.jpg',
     description: 'Sustainable hardwood handcrafted chair.',
     price: 220,
     artisanId: 'artisan-002',
@@ -37,6 +40,7 @@ export const products: Product[] = [
   {
     id: 'prod-004',
     name: 'Oak Coffee Table',
+    mainImage: '/mandala.jpg',
     description: 'Hand-finished oak coffee table.',
     price: 320,
     artisanId: 'artisan-002',
@@ -49,6 +53,7 @@ export const products: Product[] = [
   {
     id: 'prod-005',
     name: 'Woven Textile Blanket',
+    mainImage: '/street-art.jpg',
     description: 'Traditional loom woven blanket.',
     price: 140,
     artisanId: 'artisan-003',
@@ -59,6 +64,7 @@ export const products: Product[] = [
   {
     id: 'prod-006',
     name: 'Handmade Wool Scarf',
+    mainImage: '/wood.jpg',
     description: 'Soft handmade wool scarf.',
     price: 75,
     artisanId: 'artisan-003',

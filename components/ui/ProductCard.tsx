@@ -2,9 +2,12 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Product } from '@/lib/types';
 
-interface ProductCardProps { product: Product; }
+interface ProductCardProps { 
+  product: Product; 
+}
 
 const ProductCard = ({ product }: ProductCardProps) => {
+
   return (
     <article
       className="group relative rounded-2xl bg-white
@@ -13,7 +16,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
     >
       <div className="relative h-48 w-full overflow-hidden rounded-xl bg-gray-100">
         <Image
-          src={product.image || '/default.jpg'}
+          src={product.mainImage || '/default.jpg'}
           alt={product.name}
           className="h-full w-full object-cover
                 transition-transform duration-500 ease-out

@@ -1,12 +1,14 @@
-import Link from 'next/link';
 import Image from 'next/image';
+import Link from 'next/link';
 import { Product } from '@/lib/types';
+import { buildCloudinaryUrl } from '@/lib/utils/cloudinary';
 
 interface ProductCardProps { 
   product: Product; 
 }
 
 const ProductCard = ({ product }: ProductCardProps) => {
+  const mainImage = buildCloudinaryUrl(product.mainImage, 800);
 
   return (
     <article
@@ -16,12 +18,16 @@ const ProductCard = ({ product }: ProductCardProps) => {
     >
       <div className="relative h-48 w-full overflow-hidden rounded-xl bg-gray-100">
         <Image
-          src={product.mainImage || '/default.jpg'}
+          src={mainImage}
           alt={product.name}
-          className="h-full w-full object-cover
-                transition-transform duration-500 ease-out
-                group-hover:scale-105"
           fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          className="h-full w-full object-cover
+            transition-transform duration-500 ease-out
+            group-hover:scale-105"
+          /*src={product.mainImage || '/default.jpg'}
+          alt={product.name}
+          fill*/
         />
       </div>
 

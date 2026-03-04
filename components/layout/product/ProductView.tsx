@@ -1,9 +1,10 @@
 import Image from 'next/image';
-import { Gallery, Product } from '@/lib/types';
 import Header from '@/components/layout/landing-page/Header';
 import Footer from '@/components/layout/landing-page/Footer';
 import ProductCard from '@/components/ui/ProductCard';
 import Container from '@/components/ui/Container';
+import { Gallery, Product } from '@/lib/types';
+import { buildCloudinaryUrl } from '@/lib/utils/cloudinary';
 
 interface ProductDetail extends Product {
   gallery: Gallery[];
@@ -15,8 +16,8 @@ interface Props {
 }
 
 export default function ProductView({ product }: Props) {
-  const mainImage = product.gallery?.[0]?.url ?? '/default.jpg';
-
+  const mainImage = buildCloudinaryUrl(product.mainImage, 800);
+  
   return (
     <>
       <Header />
@@ -28,8 +29,13 @@ export default function ProductView({ product }: Props) {
               src={mainImage}
               alt={product.name}
               fill
-              priority
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               className="object-cover"
+              /*src={product.mainImage || '/default.jpg'}
+              alt={product.name}
+              fill
+              priority
+              className="object-cover"*/
             />
           </div>
 

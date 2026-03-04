@@ -2,7 +2,7 @@ import { Product } from '@/lib/types';
 
 export const products: Product[] = [
   // CERAMICS
-  {
+  /*{
     id: 'prod-001',
     name: 'Andean Ceramic Vase',
     mainImage: '/alicja.jpg',
@@ -71,5 +71,84 @@ export const products: Product[] = [
     stock: 20,
     category: 'Textiles',
     createdAt: '2026-02-06',
+  },*/
+
+  {
+    id: 'prod-007',
+    name: 'Photography Print - "Urban Vibes"',
+    //mainImage: 'https://res.cloudinary.com/dqgpnenbp/image/upload/v1772570176/20241227_205325_alt_gy2nvy.jpg',
+    mainImage: '20241227_205325_alt_gy2nvy',
+    description: 'Beautiful urban landscape photography print.',
+    price: 120,
+    artisanId: 'artisan-004',
+    stock: 5,
+    category: 'Photography',
+    createdAt: '2026-03-03',
+  }/*,
+  {
+    id: 'prod-008',
+    name: 'Photography Print - "Urban Vibes"',
+    mainImage: 'https://res.cloudinary.com/dqgpnenbp/image/upload/v1772568602/20250101_001259_bndrw0.jpg',
+    description: 'Beautiful urban landscape photography print.',
+    price: 120,
+    artisanId: 'artisan-004',
+    stock: 5,
+    category: 'Photography',
+    createdAt: '2026-03-03',
   },
+  {
+    id: 'prod-009',
+    name: 'Photography Print - "Urban Vibes"',
+    mainImage: 'https://res.cloudinary.com/dqgpnenbp/image/upload/v1772568601/20241227_205530_a8oblj.jpg',
+    description: 'Beautiful urban landscape photography print.',
+    price: 120,
+    artisanId: 'artisan-004',
+    stock: 5,
+    category: 'Photography',
+    createdAt: '2026-03-03',
+  },
+  {
+    id: 'prod-010',
+    name: 'Photography Print - "Urban Vibes"',
+    mainImage: 'https://res.cloudinary.com/dqgpnenbp/image/upload/v1772568597/20241230_071042_hymakg.jpg',
+    description: 'Beautiful urban landscape photography print.',
+    price: 120,
+    artisanId: 'artisan-004',
+    stock: 5,
+    category: 'Photography',
+    createdAt: '2026-03-03',
+  },
+  {
+    id: 'prod-011',
+    name: 'Photography Print - "Urban Vibes"',
+    mainImage: 'https://res.cloudinary.com/dqgpnenbp/image/upload/v1772568596/20241227_205319_dj3iqp.jpg',
+    description: 'Beautiful urban landscape photography print.',
+    price: 120,
+    artisanId: 'artisan-004',
+    stock: 5,
+    category: 'Photography',
+    createdAt: '2026-03-03',
+  },
+  {
+    id: 'prod-012',
+    name: 'Photography Print - "Urban Vibes"',
+    mainImage: 'https://res.cloudinary.com/dqgpnenbp/image/upload/v1772568591/20241227_205354_ox3qvg.jpg',
+    description: 'Beautiful urban landscape photography print.',
+    price: 120,
+    artisanId: 'artisan-004',
+    stock: 5,
+    category: 'Photography',
+    createdAt: '2026-03-03',
+  },
+  {
+    id: 'prod-013',
+    name: 'Photography Print - "Urban Vibes"',
+    mainImage: 'https://res.cloudinary.com/dqgpnenbp/image/upload/v1772568588/20250101_000836_zntxz9.jpg',
+    description: 'Beautiful urban landscape photography print.',
+    price: 120,
+    artisanId: 'artisan-004',
+    stock: 5,
+    category: 'Photography',
+    createdAt: '2026-03-03',
+  }*/ 
 ];

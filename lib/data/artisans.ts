@@ -22,4 +22,11 @@ export const artisans: Artisan[] = [
     location: 'São Paulo, Brazil',
     rating: 4.9,
   },
+  {
+    id: 'artisan-004',
+    userId: 'user-007',
+    bio: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+    location: 'Cercado, Cochabamba, Bolivia',
+    rating: 4.7,
+  }
 ];

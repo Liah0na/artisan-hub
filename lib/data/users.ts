@@ -6,7 +6,7 @@ export const users: User[] = [
     name: 'Admin System',
     email: 'admin@artisanhub.com',
     role: 'admin',
-    avatar: '/images/users/admin.jpg',
+    avatar: '',
     createdAt: '2026-01-01',
   },
   {
@@ -14,7 +14,7 @@ export const users: User[] = [
     name: 'Lucía Andrade',
     email: 'lucia@artisanhub.com',
     role: 'artisan',
-    avatar: '/images/artisans/lucia.jpg',
+    avatar: '',
     createdAt: '2026-01-02',
   },
   {
@@ -22,7 +22,7 @@ export const users: User[] = [
     name: 'Rafael Costa',
     email: 'rafael@artisanhub.com',
     role: 'artisan',
-    avatar: '/images/artisans/rafael.jpg',
+    avatar: '',
     createdAt: '2026-01-03',
   },
   {
@@ -30,7 +30,7 @@ export const users: User[] = [
     name: 'Mariana López',
     email: 'mariana@artisanhub.com',
     role: 'artisan',
-    avatar: '/images/artisans/mariana.jpg',
+    avatar: '',
     createdAt: '2026-01-04',
   },
   {
@@ -38,7 +38,7 @@ export const users: User[] = [
     name: 'Carlos Mendes',
     email: 'carlos@email.com',
     role: 'customer',
-    avatar: '/images/users/customer1.jpg',
+    avatar: '',
     createdAt: '2026-01-10',
   },
   {
@@ -46,7 +46,15 @@ export const users: User[] = [
     name: 'Ana Rodríguez',
     email: 'ana@email.com',
     role: 'customer',
-    avatar: '/images/users/customer2.jpg',
+    avatar: '',
     createdAt: '2026-01-11',
   },
+  {
+    id: 'user-007',
+    name: 'Elena Otondo Anzoleaga',
+    email: 'elenita.otondo@gmail.com',
+    role: 'customer',
+    avatar: 'https://res.cloudinary.com/dqgpnenbp/image/upload/v1772572968/avatarFemale_wfkril.png',
+    createdAt: '2026-03-03',
+  }
 ];

@@ -1,4 +1,4 @@
-const cloudName = process.env.PUBLIC_CLOUDINARY_CLOUD_NAME;
+const cloudName = process.env.CLOUDINARY_NAME;
 
 export function buildCloudinaryUrl(
   publicId: string,

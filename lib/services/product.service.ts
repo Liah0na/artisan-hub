@@ -4,21 +4,6 @@ import { products } from '@/lib/data/products';
 import { buildCloudinaryUrl } from '@/lib/utils/cloudinary';
 
 export async function getProductFullById(id: string) {
-  /*const product = products.find(p => p.id === id);
-  if (!product) return null;
-
-  const gallery = galleries.filter(g => g.productId === product.id);
-  const productReviews = reviews.filter(r => r.productId === product.id);
-  const relatedProducts = products
-    .filter(p => p.artisanId === product.artisanId && p.id !== id)
-    .slice(0, 4);
-
-  return {
-    ...product,
-    gallery,
-    reviews: productReviews,
-    relatedProducts,
-  };*/
   const product = products.find(p => p.id === id);
   if (!product) return null;
 

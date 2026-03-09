@@ -1,12 +1,14 @@
+import { artisans } from '@/lib/data/artisans';
 import { galleries } from '@/lib/data/galleries';
-import { reviews } from '@/lib/data/reviews';
 import { products } from '@/lib/data/products';
+import { reviews } from '@/lib/data/reviews';
 import { buildCloudinaryUrl } from '@/lib/utils/cloudinary';
 
-export async function getProductFullById(id: string) {
+export async function getProductById(id: string) {
   const product = products.find(p => p.id === id);
   if (!product) return null;
 
+  const artisan = artisans.find(a => a.id === product.artisanId)
   const gallery = galleries.filter(g => g.productId === id);
   const productReviews = reviews.filter(r => r.productId === id);
   const relatedProducts = products
@@ -15,6 +17,10 @@ export async function getProductFullById(id: string) {
 
   return {
     ...product,
+    artisan: artisan ? {
+      ...artisan,
+      avatar: buildCloudinaryUrl(artisan.avatar, 1000),
+    } : null,
     mainImage: buildCloudinaryUrl(product.mainImage, 1000),
     gallery: gallery.map(g => ({
       ...g,

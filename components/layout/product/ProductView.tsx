@@ -2,17 +2,12 @@
 
 import Image from 'next/image';
 import { useRef, useState } from "react";
+import { ProductDetail } from "@/lib/types";
 import Header from '@/components/layout/landing-page/Header';
 import Footer from '@/components/layout/landing-page/Footer';
-import ProductCard from '@/components/ui/ProductCard';
 import Container from '@/components/ui/Container';
-import { Gallery, Product } from '@/lib/types';
-
-
-interface ProductDetail extends Product {
-  gallery: Gallery[];
-  relatedProducts: Product[];
-}
+import ArtisanCard from '@/components/ui/ArtisanCard';
+import ProductCard from '@/components/ui/ProductCard';
 
 interface Props {
   product: ProductDetail;
@@ -23,21 +18,16 @@ export default function ProductView({ product }: Props) {
     product.mainImage,
     ...product.gallery.map((g) => g.url),
   ];
-
   const [currentIndex, setCurrentIndex] = useState(0);
-
   const goNext = () => {
     setCurrentIndex((prev) => (prev + 1) % images.length);
   };
-
   const goPrev = () => {
     setCurrentIndex((prev) =>
       prev === 0 ? images.length - 1 : prev - 1
     );
   };
-
   const thumbsRef = useRef<HTMLDivElement | null>(null);
-
   const scrollThumbs = (dir: "left" | "right") => {
     if (!thumbsRef.current) return;
 
@@ -190,6 +180,7 @@ export default function ProductView({ product }: Props) {
             <p className="mb-6 text-gray-700">
               {product.description}
             </p>
+            {product.artisan && <ArtisanCard artisan={product.artisan} />}
           </div>
         </div>
       </Container>

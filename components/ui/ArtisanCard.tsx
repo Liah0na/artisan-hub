@@ -1,36 +1,46 @@
+import { Artisan } from '@/lib/types/artisan';
 import Image from 'next/image';
+import Link from 'next/link';
 
-type ArtisanCardProps = {
-  name?: string;
-  role?: string;
-  description?: string;
-  imageUrl?: string;
+interface ArtisanCardProps {
+  artisan?: Artisan | null;
 };
 
-const ArtisanCard = ({
-  name = 'Artesano Anónimo',
-  role = 'Artesano',
-  description = 'Un talentoso artesano con habilidades únicas y pasión por su oficio.',
-  imageUrl = '/default.jpg',
-}: ArtisanCardProps) => {
+const ArtisanCard = ({ artisan }: ArtisanCardProps) => {
+
+  if (!artisan) return null;
+  
   return (
-    <div className="flex flex-col items-center text-center rounded-2xl border border-black/10 bg-white p-6 shadow-sm transition hover:shadow-md">
-      <div className="relative mb-4 h-24 w-24">
-        <Image
-          src={imageUrl}
-          alt={name}
-          className="rounded-full object-cover"
-          fill
-        />
-      </div>
+    <div className="mt-8 border rounded-xl p-5 flex items-center gap-4 hover:shadow-sm transition">
 
-      <h3 className="text-lg font-semibold">{name}</h3>
-      <span className="mb-2 text-sm text-black/60">{role}</span>
+  <Image
+    src={artisan.avatar || "/default.jpg"}
+    alt={artisan.name}
+    width={56}
+    height={56}
+    className="rounded-full object-cover"
+  />
 
-      <p className="text-sm leading-relaxed text-black/70">
-        {description}
-      </p>
-    </div>
+  <div className="flex flex-col">
+
+    <Link
+      href={`/artisan/${artisan.id}`}
+      className="font-semibold text-lg hover:text-primary"
+    >
+      {artisan.name}
+    </Link>
+
+    <p className="text-sm text-gray-500 line-clamp-2">
+      {artisan.bio}
+    </p>
+
+    <span className="text-xs text-gray-400">
+      ⭐ {artisan.rating}
+    </span>
+
+  </div>
+
+</div>
   );
 }
 

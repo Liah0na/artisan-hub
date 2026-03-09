@@ -53,7 +53,7 @@ export const users: User[] = [
     id: 'user-007',
     name: 'Elena Otondo Anzoleaga',
     email: 'elenita.otondo@gmail.com',
-    role: 'customer',
+    role: 'artisan',
     avatar: 'https://res.cloudinary.com/dqgpnenbp/image/upload/v1772572968/avatarFemale_wfkril.png',
     createdAt: '2026-03-03',
   }

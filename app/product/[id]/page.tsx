@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
-import { getProductById } from '@/lib/services/product.service';
 import ProductView from '@/components/layout/product/ProductView';
+import { getProductById } from '@/lib/services/product.service';
 
 interface PageProps {
   params: Promise<{ id: string }>;

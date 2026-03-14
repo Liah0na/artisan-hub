@@ -1,8 +1,8 @@
 import ProductCard from '@/components/ui/ProductCard';
-import { getAllProductsFull } from '@/lib/services/product.service';
+import { getAllProducts } from '@/lib/services/product.service';
 
 const ProductsSection = async () => {
-  const productList = await getAllProductsFull();
+  const productList = await getAllProducts();
 
   return (
     <section className="w-full py-16">

@@ -4,7 +4,7 @@ const ArtisansSection = () => {
   return (
     <section className="mx-auto max-w-[1200px] px-6 py-20">
       <header className="mb-12 text-center">
-        <h2 className="text-3xl font-semibold">
+        <h2 className="text-3xl font-secondary font-bold">
           Conoce a nuestros artesanos
         </h2>
         <p className="mt-2 text-black/60">
@@ -13,29 +13,14 @@ const ArtisansSection = () => {
       </header>
 
       <div className="grid gap-8 md:grid-cols-4">
-        <ArtisanCard
-          name="Marcelino Torres"
-          role="Ceramista"
-          description="Especialista en cerámica tradicional andina, con más de 15 años de experiencia."
-        />
-
-        <ArtisanCard
-          name="João Pereira"
-          role="Carpintero"
-          description="Creador de piezas únicas en madera reutilizada, combinando diseño y sostenibilidad."
-        />
-
-        <ArtisanCard
-          name="Ana López"
-          role="Textil artesanal"
-          description="Trabaja con fibras naturales y técnicas ancestrales para crear tejidos únicos."
-        />
-
-        <ArtisanCard
-          name="Ana Kurniawan"
-          role="Textil artesanal"
-          description="Trabaja con fibras naturales y técnicas ancestrales para crear tejidos únicos."
-        />
+        <ArtisanCard artisan={{
+          id: "art-001",
+          name: "Elena Otondo Anzoleaga",
+          bio: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+          avatar: "",
+          email: "elenita.otondo@gmail.com",
+          createdAt: "2026-01-01"
+        }} />
       </div>
     </section>
   );

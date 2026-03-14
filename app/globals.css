@@ -35,7 +35,7 @@ nav.navbar {
   background-color: var(--color-secondary);
 }
 
-.hover\:hover-secondary:hover {
+.hover\:my-bg-secondary:hover {
   background-color: var(--color-secondary);
 }
 

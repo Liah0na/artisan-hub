@@ -31,7 +31,7 @@ export async function getProductById(id: string) {
   };
 }
 
-export async function getAllProductsFull() {
+export async function getAllProducts() {
   return products.map(product => {
     const gallery = galleries.filter(g => g.productId === product.id);
     const productReviews = reviews.filter(r => r.productId === product.id);

@@ -1,6 +1,7 @@
-import { Artisan } from '@/lib/types/artisan';
 import Image from 'next/image';
 import Link from 'next/link';
+import Button from '@/components/ui/Button';
+import { Artisan } from '@/lib/types/artisan';
 
 interface ArtisanCardProps {
   artisan?: Artisan | null;
@@ -11,7 +12,7 @@ const ArtisanCard = ({ artisan }: ArtisanCardProps) => {
   if (!artisan) return null;
   
   return (
-    <div className="mt-8 border rounded-xl p-5 flex items-center gap-4 hover:shadow-sm transition">
+    <div className="mt-8 border border-primary rounded-xl p-5 flex items-center gap-4 hover:shadow-sm transition">
 
   <Image
     src={artisan.avatar || "/default.jpg"}
@@ -34,9 +35,11 @@ const ArtisanCard = ({ artisan }: ArtisanCardProps) => {
       {artisan.bio}
     </p>
 
-    <span className="text-xs text-gray-400">
-      ⭐ {artisan.rating}
-    </span>
+    <div className="flex mt-2">
+      <Button className='background-primary px-4 py-2 rounded-md hover:hover-secondary text-white' href={`/artisan/${artisan.id}`}>
+        View Profile
+      </Button>
+    </div>
 
   </div>
 

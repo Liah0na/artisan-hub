@@ -4,6 +4,7 @@
   --color-black: #020202;
   --color-white: #F9F9F9;
   --color-navbar: #DEC18C;
+  --color-secondary: #CEA18C;
   --font-primary: 'Jost';
   --font-secondary: 'Handlee';
 }
@@ -28,6 +29,14 @@ nav.navbar {
 
 .background-primary {
   background-color: var(--color-navbar);
+}
+
+.background-secondary {
+  background-color: var(--color-secondary);
+}
+
+.hover\:hover-secondary:hover {
+  background-color: var(--color-secondary);
 }
 
 .hover\:hover-primary:hover {

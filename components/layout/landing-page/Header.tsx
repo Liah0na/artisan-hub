@@ -9,7 +9,7 @@ export default function Header () {
       <Container className="mb-2 mt-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center">
-            <Image src="/artisanHub.svg" alt="Artisan Hub Logo" width={245} height={55} />
+            <Image src="/artisanHub.svg" alt="Artisan Hub Logo" width={245} height={55} sizes="245px" />
           </div>
           <div className="flex items-center gap-2 justify-end">
             <div>Niterói, Rio de Janeiro, Brasil</div>

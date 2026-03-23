@@ -43,3 +43,17 @@ export async function getAllProducts() {
     };
   });
 }
+
+export async function getProductsByArtisanId(artisanId: string) {
+  return products
+    .filter(p => p.artisanId === artisanId)
+    .map(product => {
+      const gallery = galleries.filter(g => g.productId === product.id);
+      const productReviews = reviews.filter(r => r.productId === product.id);
+      return {
+        ...product,
+        gallery,
+        reviews: productReviews,
+      };
+    });
+}

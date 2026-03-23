@@ -19,6 +19,7 @@ const ArtisanCard = ({ artisan }: ArtisanCardProps) => {
           src={artisan.avatar || "/default.jpg"}
           alt={artisan.name}
           fill
+          sizes="80px"
           className="object-cover"
         />
       </div>

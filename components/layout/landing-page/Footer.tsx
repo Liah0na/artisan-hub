@@ -7,7 +7,7 @@ const Footer = () => {
       <Container>
         <div className="grid gap-4 grid-cols-3">
           <section>
-            <Image className="pb-3" src="/logo.png" alt="Artisan Hub Logo" width={122} height={27} />
+            <Image className="pb-3" src="/logo.png" alt="Artisan Hub Logo" width={122} height={27} sizes="122px" />
             <p className="font-secondary text-lg">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Sed consectetur necessitatibus itaque repellat adipisci fuga modi debitis!.</p>
           </section>
           <ul>
@@ -19,7 +19,7 @@ const Footer = () => {
           <div>
             <p className="text-sm">&copy; 2026 ArtisanHub. Todos los derechos reservados.</p>
             <p className="flex gap-1 text-sm">
-              Powered by: <Image src="/neuron.svg" alt="Neuron IT" width={100} height={20} />
+              Powered by: <Image src="/neuron.svg" alt="Neuron IT" width={100} height={20} sizes="100px" />
             </p>
           </div>
         </div>

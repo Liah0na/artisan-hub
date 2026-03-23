@@ -12,5 +12,5 @@ export default async function ArtisanPage({ params }: PageProps) {
 
   if (!artisan) return notFound();
 
-  return <ArtisanView artisan={artisan} />
+  return <ArtisanView id={id} />
 }

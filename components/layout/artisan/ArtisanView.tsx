@@ -1,142 +1,21 @@
-'use client'
+import ArtisanProfile from '@/components/layout/artisan/ArtisanProfile';
+import { getArtisanById } from '@/lib/services/artisan.service';
+import { getProductsByArtisanId } from '@/lib/services/product.service';
 
-import Image from "next/image";
-import Container from "@/components/ui/Container";
-//import ProductCard from "@/components/ui/ProductCard";
-import Header from "@/components/layout/landing-page/Header";
-import Footer from "@/components/layout/landing-page/Footer";
-import Button from "@/components/ui/Button";
-import { Artisan } from "@/lib/types/artisan";
+type Props = {
+    id: string;
+};
 
-interface Props {
-  artisan?: Artisan | null;
-}
+const ArtisanView = async ({ id }: Props) => {
+  const artisan = await getArtisanById(id);
 
-export default function ArtisanView({ artisan }: Props) {
+  if (!artisan) return <div>Not found</div>;
 
-  if (!artisan) return null
+  const products = await getProductsByArtisanId(id);
 
   return (
-    <>
-      <Header />
-
-      <Container className="relative mt-20">
-
-        {/* PROFILE HEADER */}
-        <div className="bg-white rounded-2xl shadow-sm border p-8 flex flex-col md:flex-row gap-6 items-center md:items-start">
-
-          {/* AVATAR */}
-          <div className="relative w-28 h-28 rounded-full overflow-hidden border-4 border-white shadow-md flex-shrink-0">
-            <Image
-              src={artisan.avatar || "/default.jpg"}
-              alt={artisan.name}
-              fill
-              className="object-cover"
-            />
-          </div>
-
-          {/* INFO */}
-          <div className="flex flex-col text-center md:text-left gap-2">
-
-            <h1 className="text-3xl font-bold tracking-tight">
-              {artisan.name}
-            </h1>
-
-            <p className="text-gray-600 max-w-xl mt-2">
-              {artisan.bio}
-            </p>
-
-            {/* ACTIONS */}
-            <div className="flex flex-wrap gap-3 mt-4 justify-center md:justify-start">
-
-              <Button
-                href="#"
-                className="bg-primary text-white px-5 py-2 rounded-lg hover:bg-primary/90 transition"
-              >
-                Follow
-              </Button>
-
-              <Button
-                href="#"
-                className="border border-gray-300 px-5 py-2 rounded-lg hover:bg-gray-100"
-              >
-                Message
-              </Button>
-
-              <Button
-                href="#"
-                className="border border-primary text-primary px-5 py-2 rounded-lg hover:bg-primary hover:text-white"
-              >
-                Visit Shop
-              </Button>
-
-            </div>
-
-          </div>
-
-        </div>
-
-        {/* STATS */}
-        <div className="grid grid-cols-3 gap-6 mt-8">
-
-          <div className="bg-white border rounded-xl p-6 text-center">
-            <p className="text-2xl font-semibold">
-              {/*artisan.products?.length || 0*/}
-            </p>
-            <p className="text-sm text-gray-500">
-              Products
-            </p>
-          </div>
-
-          <div className="bg-white border rounded-xl p-6 text-center">
-            <p className="text-2xl font-semibold">
-              {/*artisan.rating*/}
-            </p>
-            <p className="text-sm text-gray-500">
-              Rating
-            </p>
-          </div>
-
-          <div className="bg-white border rounded-xl p-6 text-center">
-            <p className="text-2xl font-semibold">
-              124
-            </p>
-            <p className="text-sm text-gray-500">
-              Followers
-            </p>
-          </div>
-
-        </div>
-
-        {/* PRODUCTS */}
-        <div className="mt-14">
-
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-semibold">
-              Products
-            </h2>
-
-            <span className="text-sm text-gray-500">
-              {/*artisan.products?.length || 0*/} items
-            </span>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-
-            {/*artisan.products?.map((product: any) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-              />
-            ))*/} List of products will go here
-
-          </div>
-
-        </div>
-
-      </Container>
-
-      <Footer />
-    </>
-  )
+    <ArtisanProfile artisan={artisan} products={products} />
+  );
 }
+
+export default ArtisanView;

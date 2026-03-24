@@ -22,4 +22,49 @@ export const galleries: Gallery[] = [
     productId: 'prod-007',
     url: '20241230_071042_hymakg'
   },
+  { 
+    id: 'gal-010',
+    productId: 'prod-008',
+    url: '20250101_141201_agmuk3'
+  },
+  { 
+    id: 'gal-011',
+    productId: 'prod-008',
+    url: '20250218_151412_msry8u'
+  },
+  { 
+    id: 'gal-012',
+    productId: 'prod-008',
+    url: '20250101_144842_er1tfu'
+  },
+  { 
+    id: 'gal-013',
+    productId: 'prod-007',
+    url: '20250223_115809_gfghsj'
+  },
+  { 
+    id: 'gal-014',
+    productId: 'prod-007',
+    url: '20250122_173508_flstee'
+  },
+  { 
+    id: 'gal-015',
+    productId: 'prod-007',
+    url: '20250127_183030_l9vh9y'
+  },
+  { 
+    id: 'gal-016',
+    productId: 'prod-007',
+    url: '20250127_183050_rl5kic'
+  },
+  { 
+    id: 'gal-017',
+    productId: 'prod-007',
+    url: '20250117_071622_qgvvlw'
+  },
+  { 
+    id: 'gal-018',
+    productId: 'prod-007',
+    url: '20241227_205319_dj3iqp'
+  }
 ];

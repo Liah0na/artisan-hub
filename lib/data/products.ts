@@ -11,5 +11,16 @@ export const products: Product[] = [
     price: 120,
     stock: 5,
     createdAt: '2026-03-03',
-  } 
+  },
+  {
+    id: 'prod-008',
+    artisanId: 'art-001',
+    categoryId: 'cat-001',
+    description: 'Beautiful scenic photography print.',
+    mainImage: 'v1774365494/20250226_060320_l0o9x1',
+    name: 'Photography Print - "Scenic Beauty"',
+    price: 95,
+    stock: 5,
+    createdAt: '2026-03-03',
+  }
 ];

@@ -2,13 +2,14 @@ import { notFound } from 'next/navigation';
 import ProductView from '@/components/layout/product/ProductView';
 import { getProductById } from '@/lib/services/product.service';
 
-interface PageProps {
-  params: Promise<{ id: string }>;
-}
+type PageProps = {
+  params: {
+    id: string;
+  };
+};
 
 export default async function ProductPage({ params }: PageProps) {
-  const { id } = await params;
-  const product = await getProductById(id);
+  const product = await getProductById(params.id);
 
   if (!product) notFound();
 

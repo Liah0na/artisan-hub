@@ -1,22 +1,37 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { ProductResponse, ErrorResponse } from "@/lib/api/responses";
+import { getProductById } from "@/lib/services/product.service";
 
 export async function GET(
-  req: Request,
+  request: NextRequest,
   { params }: { params: { id: string } }
-): Promise<NextResponse<ProductResponse | ErrorResponse>> {
+) {
+  try {
+    const { id } = params;
 
-  //const product = await getProductFromDB(params.id);
-  const product = {} as ProductResponse["product"];
+    if (!id) {
+      return NextResponse.json<ErrorResponse>(
+        { error: "Invalid product id" },
+        { status: 400 }
+      );
+    }
 
-  if (!product) {
-    return NextResponse.json(
-      { error: "Product not found" },
-      { status: 404 }
+    const product = await getProductById(id);
+
+    if (!product) {
+      return NextResponse.json<ErrorResponse>(
+        { error: "Product not found" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json<ProductResponse>({ product });
+
+  } catch (error) {
+    console.error("Error fetching product:", error);
+    return NextResponse.json<ErrorResponse>(
+      { error: "Internal server error" },
+      { status: 500 }
     );
   }
-
-  return NextResponse.json({
-    product
-  });
-} 
+}

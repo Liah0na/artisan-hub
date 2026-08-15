@@ -1,7 +1,8 @@
 import Container from "@/components/ui/Container";
 import Divider from "@/components/ui/Divider";
-import Navbar from "@/components/ui/NavBar";
 import Image from "next/image";
+import Link from "next/link";
+import Navbar from "@/components/ui/NavBar";
 
 export default function Header () {
   return (
@@ -14,9 +15,13 @@ export default function Header () {
           <div className="flex items-center gap-2 justify-end">
             <div>Niter&oacute;i, Rio de Janeiro, Brasil</div>
             <Divider className="h-6" orientation="vertical" />
-            <p>Cadastre-se</p>
+            <Link href="/signup">
+              Cadastre-se
+            </Link>
             <Divider orientation="vertical" />
-            <p>Conecte-se</p>
+            <Link href="/signin">
+              Conecte-se
+            </Link>
           </div>
         </div>
       </Container>

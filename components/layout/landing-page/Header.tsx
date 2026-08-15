@@ -12,7 +12,7 @@ export default function Header () {
             <Image src="/artisanHub.svg" alt="Artisan Hub Logo" width={245} height={55} sizes="245px" />
           </div>
           <div className="flex items-center gap-2 justify-end">
-            <div>Niterói, Rio de Janeiro, Brasil</div>
+            <div>Niter&oacute;i, Rio de Janeiro, Brasil</div>
             <Divider className="h-6" orientation="vertical" />
             <p>Cadastre-se</p>
             <Divider orientation="vertical" />

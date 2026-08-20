@@ -14,7 +14,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${jost.variable} ${handlee.variable}`} suppressHydrationWarning>
+    <html lang="pt-BR" className={`${jost.variable} ${handlee.variable}`} suppressHydrationWarning>
       <body>
         {children}
       </body>

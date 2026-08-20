@@ -3,6 +3,6 @@ export type User = {
   avatar: string;
   name: string;
   email: string;
-  role: 'admin' | 'artisan' | 'customer';
+  role: 'admin' | 'artisan';
   createdAt: string;
 };

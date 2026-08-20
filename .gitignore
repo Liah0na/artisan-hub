@@ -23,6 +23,9 @@
 # misc
 .DS_Store
 *.pem
+.agents
+.claude
+.windsurf
 
 # debug
 npm-debug.log*
@@ -42,3 +45,5 @@ next-env.d.ts
 
 # local Thumbs files]
 Thumbs.db
+
+/lib/generated/prisma

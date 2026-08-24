@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 
 import { authOptions } from "@/auth";
+import { prisma } from "@/lib/prisma";
 
 const DashboardPage = async () => {
   const session = await getServerSession(authOptions);
@@ -9,6 +10,9 @@ const DashboardPage = async () => {
   if (!session?.user) {
     redirect("/signin");
   }
+
+  const totalProducts = await prisma.product.count({ where: { artisanId: session.user.id } });
+  const activeProducts = await prisma.product.count({ where: { artisanId: session.user.id, stock: { gt: 0 } } });
 
   return (
     <div>
@@ -23,12 +27,12 @@ const DashboardPage = async () => {
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="bg-white p-4 rounded shadow">
           <p>Total de produtos</p>
-          <h2 className="text-xl font-bold">0</h2>
+          <h2 className="text-xl font-bold">{totalProducts}</h2>
         </div>
 
         <div className="bg-white p-4 rounded shadow">
           <p>Produtos ativos</p>
-          <h2 className="text-xl font-bold">0</h2>
+          <h2 className="text-xl font-bold">{activeProducts}</h2>
         </div>
       </div>
 

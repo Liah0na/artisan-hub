@@ -25,6 +25,7 @@ const DashboardLayout = async ({ children }: { children: React.ReactNode }) => {
           <Link href="/dashboard">Visão geral</Link>
           <Link href="/dashboard/products">Produtos</Link>
           <Link href="/dashboard/products/create">Criar produto</Link>
+          <Link href="/dashboard/profile">Perfil</Link>
         </nav>
 
         <div className="mt-auto pt-10 text-sm text-gray-300">

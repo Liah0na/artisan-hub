@@ -2,7 +2,7 @@ import ProductCard from '@/components/ui/ProductCard';
 import { getAllProducts } from '@/lib/services/product.service';
 
 const ProductsSection = async () => {
-  const productList = await getAllProducts();
+  const productList = await getAllProducts(3);
 
   return (
     <section className="w-full py-24">

@@ -11,13 +11,13 @@ const Footer = () => {
             <p className="font-secondary text-lg">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Sed consectetur necessitatibus itaque repellat adipisci fuga modi debitis!.</p>
           </section>
           <ul>
-            <li><a href="#" className="mx-2 text-gray-400 hover:hover-primary transition-colors duration-300">Acerca de nosotros</a></li>
-            <li><a href="#" className="mx-2 text-gray-400 hover:hover-primary transition-colors duration-300">Política de Privacidad</a></li>
-            <li><a href="#" className="mx-2 text-gray-400 hover:hover-primary transition-colors duration-300">Términos de Servicio</a></li>
-            <li><a href="#" className="mx-2 text-gray-400 hover:hover-primary transition-colors duration-300">Contacto</a></li>
+            <li><a href="#" className="mx-2 text-gray-400 hover:hover-primary transition-colors duration-300">Sobre nós</a></li>
+            <li><a href="#" className="mx-2 text-gray-400 hover:hover-primary transition-colors duration-300">Política de Privacidade</a></li>
+            <li><a href="#" className="mx-2 text-gray-400 hover:hover-primary transition-colors duration-300">Termos de Serviço</a></li>
+            <li><a href="#" className="mx-2 text-gray-400 hover:hover-primary transition-colors duration-300">Contato</a></li>
           </ul>
           <div>
-            <p className="text-sm">&copy; 2026 ArtisanHub. Todos los derechos reservados.</p>
+            <p className="text-sm">&copy; 2026 ArtisanHub. Todos os direitos reservados.</p>
             <p className="flex gap-1 text-sm">
               Powered by: <Image src="/neuron.svg" alt="Neuron IT" width={100} height={20} sizes="100px" />
             </p>

@@ -8,7 +8,7 @@ interface ProductCardProps {
 }
 
 const ProductCard = ({ product }: ProductCardProps) => {
-  const mainImage = buildCloudinaryUrl(product.mainImage, 800);
+  const mainImage = buildCloudinaryUrl(product.images?.[0] ?? "", 800);
 
   return (
     <article

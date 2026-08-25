@@ -1,9 +1,8 @@
 export type Product = {
   id: string;
   artisanId: string;
-  categoryId: string;
   description: string;
-  mainImage: string;
+  images: string[];
   name: string;
   price: number;
   stock: number;

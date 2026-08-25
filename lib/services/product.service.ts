@@ -1,59 +1,91 @@
-import { artisans } from '@/lib/data/artisans';
-import { galleries } from '@/lib/data/galleries';
-import { products } from '@/lib/data/products';
-import { reviews } from '@/lib/data/reviews';
-import { buildCloudinaryUrl } from '@/lib/utils/cloudinary';
+import { prisma } from "@/lib/prisma";
+import { buildCloudinaryUrl } from "@/lib/utils/cloudinary";
+import { Product } from "@/lib/types/product";
+import { Artisan } from "@/lib/types/artisan";
 
-export async function getProductById(id: string) {
-  const product = products.find(p => p.id === id);
-  if (!product) return null;
+const OBJECT_ID_RE = /^[a-f\d]{24}$/i;
 
-  const artisan = artisans.find(a => a.id === product.artisanId)
-  const gallery = galleries.filter(g => g.productId === id);
-  const productReviews = reviews.filter(r => r.productId === id);
-  const relatedProducts = products
-    .filter(p => p.artisanId === product.artisanId && p.id !== id)
-    .slice(0, 4);
+type ArtisanRecord = {
+  id: string;
+  name: string;
+  email: string;
+  avatar: string | null;
+  bio: string | null;
+  phone: string | null;
+  instagram: string | null;
+  location: string | null;
+  createdAt: Date;
+};
 
+function mapProduct(product: {
+  id: string;
+  artisanId: string;
+  name: string;
+  description: string;
+  images: string[];
+  price: number;
+  stock: number;
+  createdAt: Date;
+}): Product {
   return {
-    ...product,
-    artisan: artisan ? {
-      ...artisan,
-      avatar: buildCloudinaryUrl(artisan.avatar, 1000),
-    } : null,
-    mainImage: buildCloudinaryUrl(product.mainImage, 1000),
-    gallery: gallery.map(g => ({
-      ...g,
-      url: buildCloudinaryUrl(g.url, 1000),
-    })),
-    reviews: productReviews,
-    relatedProducts,
+    id: product.id,
+    artisanId: product.artisanId,
+    name: product.name,
+    description: product.description,
+    images: product.images.map((url) => buildCloudinaryUrl(url, 1000)),
+    price: product.price,
+    stock: product.stock,
+    createdAt: product.createdAt.toISOString(),
   };
 }
 
-export async function getAllProducts() {
-  return products.map(product => {
-    const gallery = galleries.filter(g => g.productId === product.id);
-    const productReviews = reviews.filter(r => r.productId === product.id);
-
-    return {
-      ...product,
-      gallery,
-      reviews: productReviews,
-    };
-  });
+function mapArtisan(user: ArtisanRecord): Artisan {
+  return {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    avatar: user.avatar ? buildCloudinaryUrl(user.avatar, 1000) : null,
+    bio: user.bio,
+    phone: user.phone,
+    instagram: user.instagram,
+    location: user.location,
+    createdAt: user.createdAt.toISOString(),
+  };
 }
 
-export async function getProductsByArtisanId(artisanId: string) {
-  return products
-    .filter(p => p.artisanId === artisanId)
-    .map(product => {
-      const gallery = galleries.filter(g => g.productId === product.id);
-      const productReviews = reviews.filter(r => r.productId === product.id);
-      return {
-        ...product,
-        gallery,
-        reviews: productReviews,
-      };
-    });
+export async function getProductById(id: string) {
+  if (!OBJECT_ID_RE.test(id)) return null;
+
+  const product = await prisma.product.findUnique({
+    where: { id },
+    include: { artisan: true },
+  });
+  if (!product) return null;
+
+  const relatedProducts = await prisma.product.findMany({
+    where: { artisanId: product.artisanId, id: { not: product.id } },
+    orderBy: { createdAt: "desc" },
+    take: 4,
+  });
+
+  return {
+    ...mapProduct(product),
+    artisan: mapArtisan(product.artisan),
+    relatedProducts: relatedProducts.map(mapProduct),
+  };
+}
+
+export async function getAllProducts(): Promise<Product[]> {
+  const products = await prisma.product.findMany({ orderBy: { createdAt: "desc" } });
+  return products.map(mapProduct);
+}
+
+export async function getProductsByArtisanId(artisanId: string): Promise<Product[]> {
+  if (!OBJECT_ID_RE.test(artisanId)) return [];
+
+  const products = await prisma.product.findMany({
+    where: { artisanId },
+    orderBy: { createdAt: "desc" },
+  });
+  return products.map(mapProduct);
 }

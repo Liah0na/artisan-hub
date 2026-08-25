@@ -14,10 +14,7 @@ interface Props {
 }
 
 export default function ProductView({ product }: Props) {
-  const images = [
-    product.mainImage,
-    ...product.gallery.map((g) => g.url),
-  ];
+  const images = product.images.length > 0 ? product.images : ["/default.jpg"];
   const [currentIndex, setCurrentIndex] = useState(0);
   const goNext = () => {
     setCurrentIndex((prev) => (prev + 1) % images.length);

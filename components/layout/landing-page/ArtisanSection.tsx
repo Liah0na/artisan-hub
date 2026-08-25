@@ -1,6 +1,11 @@
 import ArtisanCard from "@/components/ui/ArtisanCard";
+import { getFeaturedArtisans } from "@/lib/services/artisan.service";
 
-const ArtisansSection = () => {
+const ArtisansSection = async () => {
+  const artisans = await getFeaturedArtisans(4);
+
+  if (artisans.length === 0) return null;
+
   return (
     <section className="mx-auto max-w-[1200px] px-6 py-20">
       <header className="mb-12 text-center">
@@ -13,14 +18,9 @@ const ArtisansSection = () => {
       </header>
 
       <div className="grid gap-8 md:grid-cols-4">
-        <ArtisanCard artisan={{
-          id: "art-001",
-          name: "Elena Otondo Anzoleaga",
-          bio: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-          avatar: "",
-          email: "elenita.otondo@gmail.com",
-          createdAt: "2026-01-01"
-        }} />
+        {artisans.map((artisan) => (
+          <ArtisanCard key={artisan.id} artisan={artisan} />
+        ))}
       </div>
     </section>
   );

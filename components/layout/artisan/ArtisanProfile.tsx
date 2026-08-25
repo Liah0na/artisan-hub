@@ -41,6 +41,42 @@ const ArtisanProfile = ({ artisan, products }: { artisan: Artisan; products: Pro
               {artisan.bio}
             </p>
 
+            {(artisan.location || artisan.phone || artisan.instagram) && (
+              <dl className="flex flex-wrap justify-center gap-x-6 gap-y-1 mt-1 text-sm text-gray-600 md:justify-start">
+                {artisan.location && (
+                  <div className="flex items-center gap-1">
+                    <dt className="sr-only">Localização</dt>
+                    <dd>📍 {artisan.location}</dd>
+                  </div>
+                )}
+                {artisan.phone && (
+                  <div className="flex items-center gap-1">
+                    <dt className="sr-only">Telefone</dt>
+                    <dd>
+                      <a href={`https://wa.me/${artisan.phone.replace(/\D/g, "")}`} target="_blank" rel="noopener noreferrer" className="hover:text-primary">
+                        📞 {artisan.phone}
+                      </a>
+                    </dd>
+                  </div>
+                )}
+                {artisan.instagram && (
+                  <div className="flex items-center gap-1">
+                    <dt className="sr-only">Instagram</dt>
+                    <dd>
+                      <a
+                        href={`https://instagram.com/${artisan.instagram.replace(/^@/, "")}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hover:text-primary"
+                      >
+                        📷 {artisan.instagram}
+                      </a>
+                    </dd>
+                  </div>
+                )}
+              </dl>
+            )}
+
             {/* ACTIONS */}
             <div className="flex flex-wrap gap-3 mt-4 justify-center md:justify-start">
 
@@ -76,7 +112,7 @@ const ArtisanProfile = ({ artisan, products }: { artisan: Artisan; products: Pro
 
           <div className="bg-white border rounded-xl p-6 text-center">
             <p className="text-2xl font-semibold">
-              {/*artisan.products?.length || 0*/}
+              {products?.length || 0}
             </p>
             <p className="text-sm text-gray-500">
               Products

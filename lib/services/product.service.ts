@@ -76,7 +76,7 @@ export async function getProductById(id: string) {
 }
 
 export async function getAllProducts(): Promise<Product[]> {
-  const products = await prisma.product.findMany({ orderBy: { createdAt: "desc" } });
+  const products = await prisma.product.findMany({ orderBy: { createdAt: "desc" }, take: 3 });
   return products.map(mapProduct);
 }
 

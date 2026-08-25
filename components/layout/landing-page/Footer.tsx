@@ -14,7 +14,7 @@ const Footer = () => {
             <li><a href="#" className="mx-2 text-gray-400 hover:hover-primary transition-colors duration-300">Sobre nós</a></li>
             <li><a href="#" className="mx-2 text-gray-400 hover:hover-primary transition-colors duration-300">Política de Privacidade</a></li>
             <li><a href="#" className="mx-2 text-gray-400 hover:hover-primary transition-colors duration-300">Termos de Serviço</a></li>
-            <li><a href="#" className="mx-2 text-gray-400 hover:hover-primary transition-colors duration-300">Contato</a></li>
+            <li><a href="/contact" className="mx-2 text-gray-400 hover:hover-primary transition-colors duration-300">Contato</a></li>
           </ul>
           <div>
             <p className="text-sm">&copy; 2026 ArtisanHub. Todos os direitos reservados.</p>

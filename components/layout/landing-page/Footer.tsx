@@ -1,5 +1,6 @@
 import Container from "@/components/ui/Container";
 import Image from "next/image";
+import Link from "next/link";
 
 const Footer = () => {
   return (
@@ -19,7 +20,9 @@ const Footer = () => {
           <div>
             <p className="text-sm">&copy; 2026 ArtisanHub. Todos os direitos reservados.</p>
             <p className="flex gap-1 text-sm">
-              Powered by: <Image src="/neuron.svg" alt="Neuron IT" width={100} height={20} sizes="100px" />
+              Powered by: <Link href="https://neuronit.com.br" target="_blank" rel="noopener noreferrer">
+                <Image src="/neuron.svg" alt="Neuron IT" width={100} height={20} sizes="100px" />
+              </Link>
             </p>
           </div>
         </div>

@@ -45,7 +45,13 @@ const DashboardPage = async () => {
           </div>
           <div className="flex gap-2">
             <dt className="font-medium">Perfil:</dt>
-            <dd>{session.user.role === "admin" ? "Administrador" : "Artesão"}</dd>
+            <dd>
+              {session.user.role === "superadmin"
+                ? "Super administrador"
+                : session.user.role === "admin"
+                ? "Administrador"
+                : "Artesão"}
+            </dd>
           </div>
         </dl>
       </section>

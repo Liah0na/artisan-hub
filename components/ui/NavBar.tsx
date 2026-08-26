@@ -31,10 +31,10 @@ const Navbar = () => {
         </Link>
         <ul className={`flex gap-8 font-medium transition-colors duration-300`}>
           <li><Link href="/">Início</Link></li>
-          <li><Link href="#">Produtos</Link></li>
-          <li><Link href="#">Artesãos</Link></li>
+          <li><Link href="/products">Produtos</Link></li>
+          <li><Link href="/artisans">Artesãos</Link></li>
           <li><Link href="#">Blog</Link></li>
-          <li><Link href="#">Contato</Link></li>
+          <li><Link href="/contact">Contato</Link></li>
         </ul>
         </Container>
       </nav>

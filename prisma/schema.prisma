@@ -34,6 +34,14 @@ model User {
   updatedAt    DateTime @updatedAt
 }
 
+model ContactMessage {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  email     String
+  message   String
+  createdAt DateTime @default(now())
+}
+
 model Product {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   artisanId   String   @db.ObjectId

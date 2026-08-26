@@ -39,7 +39,7 @@ const ArtisanCard = ({ artisan }: ArtisanCardProps) => {
 
         <div className="flex mt-2">
           <Button className='background-primary px-4 py-2 rounded-md hover:my-bg-secondary text-white' href={`/artisan/${artisan.id}`}>
-            View Profile
+            Ver perfil
           </Button>
         </div>
 

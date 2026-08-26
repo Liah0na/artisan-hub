@@ -39,11 +39,11 @@ export async function getArtisanById(id: string): Promise<Artisan | null> {
   return mapArtisan(user);
 }
 
-export async function getFeaturedArtisans(limit = 4): Promise<Artisan[]> {
+export async function getArtisans(limit?: number): Promise<Artisan[]> {
   const users = await prisma.user.findMany({
     where: { role: "artisan" },
     orderBy: { createdAt: "desc" },
-    take: limit,
+    ...(limit ? { take: limit } : {}),
   });
 
   return users.map((user) => mapArtisan(user, 500));

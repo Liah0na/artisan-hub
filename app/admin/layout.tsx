@@ -10,7 +10,9 @@ const AdminLayout = async ({ children }: { children: React.ReactNode }) => {
   const session = await getServerSession(authOptions);
 
   if (!session?.user) redirect("/signin");
-  if (session.user.role !== "admin") redirect("/dashboard");
+  if (session.user.role !== "admin" && session.user.role !== "superadmin") redirect("/dashboard");
+
+  const isSuperAdmin = session.user.role === "superadmin";
 
   return (
     <div className="flex min-h-screen">
@@ -24,11 +26,14 @@ const AdminLayout = async ({ children }: { children: React.ReactNode }) => {
           <Link href="/admin/messages">Mensagens</Link>
           <Link href="/admin/artisans">Artesãos</Link>
           <Link href="/admin/products">Produtos</Link>
+          {isSuperAdmin && <Link href="/admin/admins">Administradores</Link>}
         </nav>
 
         <div className="mt-auto pt-10 text-sm text-gray-300">
           <p className="mb-1 truncate">{session.user.email}</p>
-          <p className="mb-3 text-xs uppercase tracking-wide text-gray-400">Administrador</p>
+          <p className="mb-3 text-xs uppercase tracking-wide text-gray-400">
+            {isSuperAdmin ? "Super administrador" : "Administrador"}
+          </p>
           <SignOutButton />
         </div>
       </aside>

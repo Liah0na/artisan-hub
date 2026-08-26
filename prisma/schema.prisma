@@ -16,6 +16,7 @@ datasource db {
 enum Role {
   artisan
   admin
+  superadmin
 }
 
 model User {

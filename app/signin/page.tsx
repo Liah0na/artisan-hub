@@ -1,6 +1,6 @@
 "use client";
 
-import { signIn } from "next-auth/react";
+import { getSession, signIn } from "next-auth/react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -30,7 +30,10 @@ export default function SigninPage() {
         return;
       }
 
-      router.replace("/dashboard");
+      const session = await getSession();
+      const role = session?.user?.role;
+
+      router.replace(role === "admin" || role === "superadmin" ? "/admin" : "/dashboard");
       router.refresh();
     } catch {
       setError("Não foi possível entrar. Tente novamente.");

@@ -3,8 +3,11 @@
 :root {
   --color-black: #020202;
   --color-white: #F9F9F9;
+  --color-dark-gray: #1A1A1A;
   --color-navbar: #DEC18C;
   --color-secondary: #CEA18C;
+  --color-hover: #D3BE97;
+  --color-dark: #987667;
   --font-primary: 'Jost';
   --font-secondary: 'Handlee';
 }
@@ -39,12 +42,19 @@ nav.navbar {
   background-color: var(--color-secondary);
 }
 
+.hover\:hover-primary {
+  color: var(--color-dark-gray);
+  font-weight: normal;
+}
+
 .hover\:hover-primary:hover {
-  color: var(--color-navbar);
+  color: var(--color-secondary);
+  font-weight: bold;
 }
 
 .display-logo {
-  display: block;
+  display: flex;
+  align-items: center;
 }
 
 .hidden-logo {
@@ -87,4 +97,25 @@ nav.navbar {
   100% {
     transform: translateX(100%);
   }
+}
+
+.nav-item {
+  border-radius: 0.25rem;
+  padding: 15px 25px;
+  transition: background-color 0.3s ease, margin 0.3s ease;
+}
+
+.nav-item:hover {
+  background-color: var(--color-secondary);
+  border: 1px solid var(--color-hover);
+  cursor: pointer;
+  padding: 14px 24px;
+}
+
+.header-option {
+  color: var(--color-dark);
+}
+
+.header-option:hover {
+  border-bottom: 1px dashed var(--color-dark);
 }

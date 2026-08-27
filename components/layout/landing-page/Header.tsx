@@ -15,11 +15,11 @@ export default function Header () {
           <div className="flex items-center gap-2 justify-end">
             <div>Niter&oacute;i, Rio de Janeiro, Brasil</div>
             <Divider className="h-6" orientation="vertical" />
-            <Link href="/signup">
+            <Link className="header-option" href="/signup">
               Cadastre-se
             </Link>
             <Divider orientation="vertical" />
-            <Link href="/signin">
+            <Link className="header-option" href="/signin">
               Conecte-se
             </Link>
           </div>

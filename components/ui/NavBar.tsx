@@ -19,7 +19,7 @@ const Navbar = () => {
 
   return (
       <nav className={`w-full font-medium ${scrolled ? 'fixed top-0 z-50 bg-white/80 backdrop-blur-md shadow-sm' : 'navbar'}`}>
-        <Container className="grid grid-cols-2 p-6"> 
+        <Container className="grid grid-cols-2"> 
         <Link className={`${scrolled ? 'display-logo' : 'hidden-logo '}`} href="/">
           <Image
             src="/artisanHub.svg"
@@ -29,12 +29,12 @@ const Navbar = () => {
             priority
           />
         </Link>
-        <ul className={`flex gap-8 font-medium transition-colors duration-300`}>
-          <li><Link href="/">Início</Link></li>
-          <li><Link href="/products">Produtos</Link></li>
-          <li><Link href="/artisans">Artesãos</Link></li>
-          <li><Link href="#">Blog</Link></li>
-          <li><Link href="/contact">Contato</Link></li>
+        <ul className={`flex gap-2 font-medium transition-colors duration-300`}>
+          <li className="nav-item"><Link href="/">Início</Link></li>
+          <li className="nav-item"><Link href="/products">Produtos</Link></li>
+          <li className="nav-item"><Link href="/artisans">Artesãos</Link></li>
+          <li className="nav-item"><Link href="#">Blog</Link></li>
+          <li className="nav-item"><Link href="/contact">Contato</Link></li>
         </ul>
         </Container>
       </nav>

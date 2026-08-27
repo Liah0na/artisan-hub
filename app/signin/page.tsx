@@ -44,60 +44,75 @@ export default function SigninPage() {
 
   return (
     <main className="flex min-h-screen items-center justify-center px-6 py-12">
-      <form
-        onSubmit={handleSubmit}
-        className="w-full max-w-md space-y-5"
-      >
-        <h1 className="text-3xl font-semibold">
-          Conecte-se
-        </h1>
+      <div className="w-full max-w-md">
+        <div className="mb-8 text-center">
+          <h1 className="text-3xl font-semibold">
+            Conecte-se
+          </h1>
 
-        <p className="text-sm text-gray-500">
-          Acesse sua conta no Artisan Hub.
-        </p>
-
-        <input
-          id="email"
-          name="email"
-          type="email"
-          placeholder="E-mail"
-          value={email}
-          onChange={(e) =>
-            setEmail(e.target.value)
-          }
-          required
-          autoComplete="email"
-          className="w-full border rounded-md p-3"
-        />
-
-        <input
-          id="password"
-          name="password"
-          type="password"
-          placeholder="Senha"
-          value={password}
-          onChange={(e) =>
-            setPassword(e.target.value)
-          }
-          required
-          autoComplete="current-password"
-          className="w-full border rounded-md p-3"
-        />
-
-        {error && (
-          <p className="rounded-md border border-red-500/30 px-4 py-3 text-sm text-red-600">
-            {error}
+          <p className="text-sm text-gray-500">
+            Acesse sua conta no Artisan Hub.
           </p>
-        )}
-
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full rounded-md p-3 disabled:cursor-not-allowed disabled:opacity-50"
+        </div>
+        <form
+          onSubmit={handleSubmit}
+          className="w-full max-w-md space-y-5"
         >
-          {loading ? "Entrando..." : "Entrar"}
-        </button>
-      </form>
+
+          <input
+            id="email"
+            name="email"
+            type="email"
+            placeholder="E-mail"
+            value={email}
+            onChange={(e) =>
+              setEmail(e.target.value)
+            }
+            required
+            autoComplete="email"
+            className="w-full border rounded-md p-3"
+          />
+
+          <input
+            id="password"
+            name="password"
+            type="password"
+            placeholder="Senha"
+            value={password}
+            onChange={(e) =>
+              setPassword(e.target.value)
+            }
+            required
+            autoComplete="current-password"
+            className="w-full border rounded-md p-3"
+          />
+
+          {error && (
+            <p className="rounded-md border border-red-500/30 px-4 py-3 text-sm text-red-600">
+              {error}
+            </p>
+          )}
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full rounded-md p-3 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {loading ? "Entrando..." : "Entrar"}
+          </button>
+        </form>
+        <div className="mt-6 text-center text-sm">
+          <span className="text-gray-500">
+            Ainda não tem uma conta?
+          </span>{" "}
+          <a
+            href="/signup"
+            className="font-medium underline"
+          >
+            Cadastre-se
+          </a>
+        </div>
+      </div>
     </main>
   );
 }

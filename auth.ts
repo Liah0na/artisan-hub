@@ -28,6 +28,10 @@ export const authOptions: NextAuthOptions = {
 
         if (!validPassword) return null;
 
+        if (!user.emailVerified) {
+          throw new Error("EmailNotVerified");
+        }
+
         return {
           id: user.id,
           name: user.name,

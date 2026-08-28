@@ -9,6 +9,10 @@ export default function SignupPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  // Honeypot: kept out of view for real users via CSS (not display:none,
+  // which some bots detect and skip). Must stay empty for the request
+  // to be treated as human.
+  const [website, setWebsite] = useState("");
 
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -65,12 +69,18 @@ export default function SignupPage() {
           name: normalizedName,
           email: normalizedEmail,
           password,
+          website,
         }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
+        if (response.status === 429) {
+          setError("Muitas tentativas. Aguarde um pouco antes de tentar novamente.");
+          return;
+        }
+
         setError(
           data.error || "Não foi possível criar sua conta."
         );
@@ -78,13 +88,14 @@ export default function SignupPage() {
       }
 
       setSuccess(
-        "Conta criada com sucesso! Agora você já pode entrar."
+        "Conta criada com sucesso! Enviamos um link de confirmação para o seu e-mail — verifique sua caixa de entrada para ativar sua conta."
       );
 
       setName("");
       setEmail("");
       setPassword("");
       setConfirmPassword("");
+      setWebsite("");
     } catch {
       setError(
         "Não foi possível conectar ao servidor. Tente novamente."
@@ -130,6 +141,31 @@ export default function SignupPage() {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Honeypot field: invisible to real users, irresistible to bots
+                that auto-fill every input. Left unstyled by `hidden`/`display:none`
+                on purpose so simple bots don't detect and skip it. */}
+            <div
+              aria-hidden="true"
+              style={{
+                position: "absolute",
+                left: "-9999px",
+                width: "1px",
+                height: "1px",
+                overflow: "hidden",
+              }}
+            >
+              <label htmlFor="website">Website</label>
+              <input
+                id="website"
+                name="website"
+                type="text"
+                tabIndex={-1}
+                autoComplete="off"
+                value={website}
+                onChange={(event) => setWebsite(event.target.value)}
+              />
+            </div>
+
             <div>
               <label
                 htmlFor="name"

@@ -21,19 +21,24 @@ enum Role {
 }
 
 model User {
-  id           String   @id @default(auto()) @map("_id") @db.ObjectId
-  name         String
-  email        String   @unique
-  passwordHash String
-  role         Role     @default(artisan)
-  avatar       String?
-  bio          String?
-  phone        String?
-  instagram    String?
-  location     String?
-  products     Product[]
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id                        String    @id @default(auto()) @map("_id") @db.ObjectId
+  name                      String
+  email                     String    @unique
+  passwordHash              String
+  role                      Role      @default(artisan)
+  avatar                    String?
+  bio                       String?
+  phone                     String?
+  instagram                 String?
+  location                  String?
+  products                  Product[]
+  emailVerified             Boolean   @default(false)
+  verificationToken         String?
+  verificationTokenExpires  DateTime?
+  createdAt                 DateTime  @default(now())
+  updatedAt                 DateTime  @updatedAt
+
+  @@index([verificationToken])
 }
 
 model ContactMessage {

@@ -1,13 +1,36 @@
 "use client";
 
 import { getSession, signIn } from "next-auth/react";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 
-export default function SigninPage() {
+const VERIFY_MESSAGES: Record<string, { text: string; tone: "success" | "error" }> = {
+  success: {
+    text: "E-mail confirmado com sucesso! Agora você já pode entrar.",
+    tone: "success",
+  },
+  expired: {
+    text: "Este link de confirmação expirou. Cadastre-se novamente para receber um novo.",
+    tone: "error",
+  },
+  invalid: {
+    text: "Este link de confirmação é inválido.",
+    tone: "error",
+  },
+  missing: {
+    text: "Link de confirmação incompleto.",
+    tone: "error",
+  },
+};
+
+function SigninForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const verifyStatus = searchParams.get("verify");
+  const verifyMessage = verifyStatus ? VERIFY_MESSAGES[verifyStatus] : undefined;
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -26,6 +49,11 @@ export default function SigninPage() {
         password,
         redirect: false,
       });
+
+      if (result?.error === "EmailNotVerified") {
+        setError("Confirme seu e-mail antes de entrar. Verifique sua caixa de entrada.");
+        return;
+      }
 
       if (result?.error) {
         setError("E-mail ou senha inválidos.");
@@ -78,6 +106,18 @@ export default function SigninPage() {
               Acesse sua conta no Artisan Hub.
             </p>
           </div>
+
+          {verifyMessage && (
+            <p
+              className={`mb-5 rounded-md border px-4 py-3 text-sm ${
+                verifyMessage.tone === "success"
+                  ? "border-green-500/30 bg-green-50 text-green-600"
+                  : "border-red-500/30 bg-red-50 text-red-600"
+              }`}
+            >
+              {verifyMessage.text}
+            </p>
+          )}
 
           <form onSubmit={handleSubmit} className="w-full space-y-5">
             <div>
@@ -159,5 +199,13 @@ export default function SigninPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function SigninPage() {
+  return (
+    <Suspense fallback={null}>
+      <SigninForm />
+    </Suspense>
   );
 }

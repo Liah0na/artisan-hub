@@ -1,6 +1,8 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
 
 export default function SignupPage() {
   const [name, setName] = useState("");
@@ -93,140 +95,172 @@ export default function SignupPage() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center px-6 py-12">
+    <main
+      className="flex min-h-screen items-center justify-center px-6 py-16"
+      style={{ backgroundColor: "var(--color-white)" }}
+    >
       <div className="w-full max-w-md">
-        <div className="mb-8 text-center">
-          <h1 className="text-3xl font-semibold tracking-tight">
-            Crie sua conta
-          </h1>
+        <div
+          className="rounded-xl border bg-white px-8 py-10 shadow-sm sm:px-10"
+          style={{ borderColor: "rgba(2, 2, 2, 0.08)" }}
+        >
+          <div className="mb-8 flex flex-col items-center text-center">
+            <Link href="/" className="mb-6">
+              <Image
+                src="/artisanHub.svg"
+                alt="ArtisanHub"
+                width={150}
+                height={38}
+                priority
+              />
+            </Link>
 
-          <p className="mt-2 text-sm text-gray-500">
-            Comece sua jornada como artesão no Artisan Hub.
-          </p>
+            <div
+              className="mb-4 h-px w-12"
+              style={{ backgroundColor: "var(--color-navbar)" }}
+            />
+
+            <h1 className="text-2xl font-semibold tracking-tight">
+              Crie sua conta
+            </h1>
+
+            <p className="mt-2 text-sm" style={{ color: "var(--color-dark)" }}>
+              Comece sua jornada como artesão no Artisan Hub.
+            </p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div>
+              <label
+                htmlFor="name"
+                className="mb-2 block text-sm font-medium"
+              >
+                Nome
+              </label>
+
+              <input
+                id="name"
+                name="name"
+                type="text"
+                value={name}
+                onChange={(event) => setName(event.target.value)}
+                required
+                autoComplete="name"
+                className="w-full rounded-md border border-black/15 bg-white px-4 py-3 text-sm outline-none transition focus:border-transparent focus:ring-2"
+                style={{ ["--tw-ring-color" as string]: "var(--color-dark)" }}
+                placeholder="Seu nome"
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="email"
+                className="mb-2 block text-sm font-medium"
+              >
+                E-mail
+              </label>
+
+              <input
+                id="email"
+                name="email"
+                type="email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                required
+                autoComplete="email"
+                className="w-full rounded-md border border-black/15 bg-white px-4 py-3 text-sm outline-none transition focus:border-transparent focus:ring-2"
+                style={{ ["--tw-ring-color" as string]: "var(--color-dark)" }}
+                placeholder="seu@email.com"
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="password"
+                className="mb-2 block text-sm font-medium"
+              >
+                Senha
+              </label>
+
+              <input
+                id="password"
+                name="password"
+                type="password"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                required
+                minLength={8}
+                autoComplete="new-password"
+                className="w-full rounded-md border border-black/15 bg-white px-4 py-3 text-sm outline-none transition focus:border-transparent focus:ring-2"
+                style={{ ["--tw-ring-color" as string]: "var(--color-dark)" }}
+                placeholder="Mínimo de 8 caracteres"
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="confirmPassword"
+                className="mb-2 block text-sm font-medium"
+              >
+                Confirmar senha
+              </label>
+
+              <input
+                id="confirmPassword"
+                name="confirmPassword"
+                type="password"
+                value={confirmPassword}
+                onChange={(event) =>
+                  setConfirmPassword(event.target.value)
+                }
+                required
+                minLength={8}
+                autoComplete="new-password"
+                className="w-full rounded-md border border-black/15 bg-white px-4 py-3 text-sm outline-none transition focus:border-transparent focus:ring-2"
+                style={{ ["--tw-ring-color" as string]: "var(--color-dark)" }}
+                placeholder="Repita sua senha"
+              />
+            </div>
+
+            {error && (
+              <p className="rounded-md border border-red-500/30 bg-red-50 px-4 py-3 text-sm text-red-600">
+                {error}
+              </p>
+            )}
+
+            {success && (
+              <p className="rounded-md border border-green-500/30 bg-green-50 px-4 py-3 text-sm text-green-600">
+                {success}
+              </p>
+            )}
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full rounded-md px-4 py-3 text-sm font-medium tracking-wide text-white transition disabled:cursor-not-allowed disabled:opacity-50"
+              style={{ backgroundColor: "var(--color-black)" }}
+              onMouseEnter={(e) => {
+                if (!loading) e.currentTarget.style.backgroundColor = "var(--color-dark)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "var(--color-black)";
+              }}
+            >
+              {loading ? "Criando sua conta..." : "Criar conta"}
+            </button>
+          </form>
         </div>
 
-        <form
-          onSubmit={handleSubmit}
-          className="space-y-5"
-        >
-          <div>
-            <label
-              htmlFor="name"
-              className="mb-2 block text-sm font-medium"
-            >
-              Nome
-            </label>
-
-            <input
-              id="name"
-              name="name"
-              type="text"
-              value={name}
-              onChange={(event) => setName(event.target.value)}
-              required
-              autoComplete="name"
-              className="w-full rounded-md border px-4 py-3 outline-none transition focus:ring-2"
-              placeholder="Seu nome"
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="email"
-              className="mb-2 block text-sm font-medium"
-            >
-              E-mail
-            </label>
-
-            <input
-              id="email"
-              name="email"
-              type="email"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              required
-              autoComplete="email"
-              className="w-full rounded-md border px-4 py-3 outline-none transition focus:ring-2"
-              placeholder="seu@email.com"
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="password"
-              className="mb-2 block text-sm font-medium"
-            >
-              Senha
-            </label>
-
-            <input
-              id="password"
-              name="password"
-              type="password"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              required
-              minLength={8}
-              autoComplete="new-password"
-              className="w-full rounded-md border px-4 py-3 outline-none transition focus:ring-2"
-              placeholder="Mínimo de 8 caracteres"
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="confirmPassword"
-              className="mb-2 block text-sm font-medium"
-            >
-              Confirmar senha
-            </label>
-
-            <input
-              id="confirmPassword"
-              name="confirmPassword"
-              type="password"
-              value={confirmPassword}
-              onChange={(event) =>
-                setConfirmPassword(event.target.value)
-              }
-              required
-              minLength={8}
-              autoComplete="new-password"
-              className="w-full rounded-md border px-4 py-3 outline-none transition focus:ring-2"
-              placeholder="Repita sua senha"
-            />
-          </div>
-
-          {error && (
-            <p className="rounded-md border border-red-500/30 px-4 py-3 text-sm text-red-600">
-              {error}
-            </p>
-          )}
-
-          {success && (
-            <p className="rounded-md border border-green-500/30 px-4 py-3 text-sm text-green-600">
-              {success}
-            </p>
-          )}
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full rounded-md px-4 py-3 font-medium transition disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {loading ? "Criando sua conta..." : "Criar conta"}
-          </button>
-        </form>
         <div className="mt-6 text-center text-sm">
-          <span className="text-gray-500">
+          <span style={{ color: "var(--color-dark)" }}>
             Já possui uma conta?
           </span>{" "}
-          <a
+          <Link
             href="/signin"
-            className="font-medium underline"
+            className="font-medium underline underline-offset-2"
           >
             Conecte-se
-          </a>
+          </Link>
         </div>
       </div>
     </main>

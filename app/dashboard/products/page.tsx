@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/auth";
+import { authOptions } from "@/lib/utils/auth";
 import { prisma } from "@/lib/prisma";
 import ProductsTable from "@/components/layout/dashboard/ProductsTable";
 

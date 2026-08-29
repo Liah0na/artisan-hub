@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 
-import { authOptions } from "@/auth";
+import { authOptions } from "@/lib/utils/auth";
 import { cloudinary } from "@/lib/utils/cloudinary.server";
 
 export const runtime = "nodejs";

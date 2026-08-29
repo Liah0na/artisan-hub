@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/auth";
+import { authOptions } from "@/lib/utils/auth";
 import { prisma } from "@/lib/prisma";
 import ProductForm from "@/components/layout/dashboard/ProductForm";
 

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { getServerSession } from "next-auth";
 
-import { authOptions } from "@/auth";
+import { authOptions } from "@/lib/utils/auth";
 import { prisma } from "@/lib/prisma";
 
 export default async function AdminOverviewPage() {

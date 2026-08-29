@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 
-import { authOptions } from "@/auth";
+import { authOptions } from "@/lib/utils/auth";
 import { prisma } from "@/lib/prisma";
 
 const DashboardPage = async () => {

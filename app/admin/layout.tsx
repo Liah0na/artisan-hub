@@ -3,7 +3,7 @@ import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 
-import { authOptions } from "@/auth";
+import { authOptions } from "@/lib/utils/auth";
 import SignOutButton from "@/components/auth/SignOutButton";
 
 const AdminLayout = async ({ children }: { children: React.ReactNode }) => {

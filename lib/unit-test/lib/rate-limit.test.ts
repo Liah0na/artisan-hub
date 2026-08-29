@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { rateLimit, getClientIp } from "../rate-limit";
+import { rateLimit, getClientIp } from "../../rate-limit";
 
 // Each test uses its own unique key so the module-level bucket map from one
 // test can't leak into another.

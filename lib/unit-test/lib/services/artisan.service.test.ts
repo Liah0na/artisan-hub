@@ -12,7 +12,7 @@ vi.mock("@/lib/prisma", () => ({
   },
 }));
 
-import { getArtisanById, getArtisans } from "../services/artisan.service";
+import { getArtisanById, getArtisans } from "../../../services/artisan.service";
 
 const VALID_ID = "507f191e810c19729de860ea";
 

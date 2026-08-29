@@ -16,7 +16,7 @@ import {
   getProductById,
   getAllProducts,
   getProductsByArtisanId,
-} from "../services/product.service";
+} from "../../../services/product.service";
 
 const VALID_ID = "507f1f77bcf86cd799439011"; // valid 24-char hex ObjectId
 const VALID_ARTISAN_ID = "507f191e810c19729de860ea";

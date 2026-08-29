@@ -3,7 +3,7 @@ import {
   generateVerificationToken,
   hashToken,
   VERIFICATION_TOKEN_TTL_MS,
-} from "../tokens";
+} from "../../tokens";
 
 describe("hashToken", () => {
   it("is deterministic for the same input", () => {

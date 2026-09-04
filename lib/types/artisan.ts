@@ -6,6 +6,5 @@ export type Artisan = {
   instagram: string | null;
   location: string | null;
   name: string;
-  email: string;
   createdAt: string;
 };

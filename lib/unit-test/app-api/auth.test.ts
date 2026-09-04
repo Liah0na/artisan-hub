@@ -61,9 +61,10 @@ describe("authorize()", () => {
     expect(result).toBeNull();
   });
 
-  it("throws EmailNotVerified when the password is correct but the email isn't verified", async () => {
+  it("throws EmailNotVerified when the password is correct but an artisan's email isn't verified", async () => {
     findUniqueMock.mockResolvedValueOnce({
       id: "u1",
+      role: "artisan",
       passwordHash: "hashed",
       emailVerified: false,
     });
@@ -72,6 +73,22 @@ describe("authorize()", () => {
     await expect(
       authorize({ email: "maria@example.com", password: "senha123" })
     ).rejects.toThrow("EmailNotVerified");
+  });
+
+  it("does NOT require emailVerified for admin/superadmin roles (item #7)", async () => {
+    findUniqueMock.mockResolvedValueOnce({
+      id: "u1",
+      name: "Admin",
+      email: "admin@example.com",
+      role: "admin",
+      passwordHash: "hashed",
+      emailVerified: false,
+    });
+    bcryptCompareMock.mockResolvedValueOnce(true);
+
+    const result = await authorize({ email: "admin@example.com", password: "senha123" });
+
+    expect(result).toEqual({ id: "u1", name: "Admin", email: "admin@example.com", role: "admin" });
   });
 
   it("returns the user's public fields on a successful login", async () => {

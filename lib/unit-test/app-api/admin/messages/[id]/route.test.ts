@@ -30,6 +30,7 @@ function makeParams(id: string) {
 function makeRequest(body: unknown) {
   return new Request(`https://x/api/admin/messages/${MESSAGE_ID}`, {
     method: "PATCH",
+    headers: { origin: "https://x", host: "x" },
     body: JSON.stringify(body),
   });
 }
@@ -83,7 +84,7 @@ describe("DELETE /api/admin/messages/[id]", () => {
   it("returns 401 without an admin/superadmin session", async () => {
     getServerSessionMock.mockResolvedValueOnce(null);
 
-    const res = await DELETE(new Request("https://x"), makeParams(MESSAGE_ID));
+    const res = await DELETE(new Request("https://x", { method: "DELETE", headers: { origin: "https://x", host: "x" } }), makeParams(MESSAGE_ID));
 
     expect(res.status).toBe(401);
     expect(deleteMock).not.toHaveBeenCalled();
@@ -93,7 +94,7 @@ describe("DELETE /api/admin/messages/[id]", () => {
     getServerSessionMock.mockResolvedValueOnce({ user: { role: "superadmin" } });
     deleteMock.mockRejectedValueOnce(new Error("not found"));
 
-    const res = await DELETE(new Request("https://x"), makeParams(MESSAGE_ID));
+    const res = await DELETE(new Request("https://x", { method: "DELETE", headers: { origin: "https://x", host: "x" } }), makeParams(MESSAGE_ID));
 
     expect(res.status).toBe(200);
     expect(await res.json()).toEqual({ ok: true });

@@ -29,6 +29,7 @@ import { POST } from "@/app/api/admin/admins/route";
 function makeRequest(body: unknown) {
   return new Request("https://x/api/admin/admins", {
     method: "POST",
+    headers: { origin: "https://x", host: "x" },
     body: JSON.stringify(body),
   });
 }

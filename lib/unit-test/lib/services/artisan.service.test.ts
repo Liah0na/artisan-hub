@@ -16,12 +16,22 @@ import { getArtisanById, getArtisans } from "../../../services/artisan.service";
 
 const VALID_ID = "507f191e810c19729de860ea";
 
+const PUBLIC_SELECT = {
+  id: true,
+  name: true,
+  avatar: true,
+  bio: true,
+  phone: true,
+  instagram: true,
+  location: true,
+  createdAt: true,
+};
+
 function makeUser(overrides: Partial<Record<string, unknown>> = {}) {
   return {
     id: VALID_ID,
     name: "Ana Artesã",
-    email: "ana@example.com",
-    avatar: "artisans/ana.jpg",
+    avatar: { url: "https://res.cloudinary.com/test-cloud/image/upload/artisans/ana.jpg", publicId: "artisan-hub/avatars/507f191e810c19729de860ea/ana" },
     bio: "Ceramista há 10 anos",
     phone: "+55 31 99999-0000",
     instagram: "@ana.ceramica",
@@ -52,14 +62,24 @@ describe("getArtisanById", () => {
     expect(result).toBeNull();
   });
 
-  it("maps a found user to an Artisan, building an avatar URL at size 1000", async () => {
+  it("only selects public fields (never email)", async () => {
+    findUniqueMock.mockResolvedValueOnce(makeUser());
+
+    await getArtisanById(VALID_ID);
+
+    expect(findUniqueMock).toHaveBeenCalledWith({ where: { id: VALID_ID }, select: PUBLIC_SELECT });
+  });
+
+  it("maps a found user to an Artisan (without email), building an avatar URL from its publicId at size 1000", async () => {
     findUniqueMock.mockResolvedValueOnce(makeUser());
 
     const result = await getArtisanById(VALID_ID);
 
     expect(result).not.toBeNull();
     expect(result!.id).toBe(VALID_ID);
+    expect(result).not.toHaveProperty("email");
     expect(result!.avatar).toContain("w_1000,h_1000");
+    expect(result!.avatar).toContain("artisan-hub/avatars/507f191e810c19729de860ea/ana");
     expect(result!.createdAt).toBe("2020-05-01T00:00:00.000Z");
   });
 
@@ -73,7 +93,7 @@ describe("getArtisanById", () => {
 });
 
 describe("getArtisans", () => {
-  it("queries only users with the artisan role, newest first", async () => {
+  it("queries only users with the artisan role, newest first, selecting only public fields", async () => {
     findManyMock.mockResolvedValueOnce([]);
 
     await getArtisans();
@@ -81,6 +101,7 @@ describe("getArtisans", () => {
     expect(findManyMock).toHaveBeenCalledWith({
       where: { role: "artisan" },
       orderBy: { createdAt: "desc" },
+      select: PUBLIC_SELECT,
     });
   });
 
@@ -92,6 +113,7 @@ describe("getArtisans", () => {
     expect(findManyMock).toHaveBeenCalledWith({
       where: { role: "artisan" },
       orderBy: { createdAt: "desc" },
+      select: PUBLIC_SELECT,
       take: 5,
     });
   });
@@ -103,5 +125,6 @@ describe("getArtisans", () => {
 
     expect(result).toHaveLength(1);
     expect(result[0].avatar).toContain("w_500,h_500");
+    expect(result[0]).not.toHaveProperty("email");
   });
 });

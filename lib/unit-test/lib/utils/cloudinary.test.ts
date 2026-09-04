@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { buildCloudinaryUrl } from "@/lib/utils/cloudinary";
+import { buildCloudinaryUrl, isOwnedCloudinaryAsset } from "@/lib/utils/cloudinary";
 
 describe("buildCloudinaryUrl", () => {
   const originalCloudName = process.env.NEXT_PUBLIC_CLOUDINARY_NAME;
@@ -45,5 +45,46 @@ describe("buildCloudinaryUrl", () => {
     expect(result).toBe(
       "https://res.cloudinary.com/test-cloud/image/upload/f_auto,q_75,w_1000,h_1000,c_fill/avatars/xyz"
     );
+  });
+});
+
+describe("isOwnedCloudinaryAsset", () => {
+  const USER_ID = "507f191e810c19729de860ea";
+
+  it("accepts a publicId that lives under the user's own avatar folder", () => {
+    expect(
+      isOwnedCloudinaryAsset(`artisan-hub/avatars/${USER_ID}/abc123`, "avatars", USER_ID)
+    ).toBe(true);
+  });
+
+  it("accepts a publicId that lives under the user's own product folder", () => {
+    expect(
+      isOwnedCloudinaryAsset(`artisan-hub/products/${USER_ID}/abc123`, "products", USER_ID)
+    ).toBe(true);
+  });
+
+  it("rejects a publicId that belongs to a different user", () => {
+    expect(
+      isOwnedCloudinaryAsset("artisan-hub/avatars/someone-else-id/abc123", "avatars", USER_ID)
+    ).toBe(false);
+  });
+
+  it("rejects a publicId of the wrong kind (product asset submitted as an avatar)", () => {
+    expect(
+      isOwnedCloudinaryAsset(`artisan-hub/products/${USER_ID}/abc123`, "avatars", USER_ID)
+    ).toBe(false);
+  });
+
+  it("rejects an empty or non-string publicId", () => {
+    expect(isOwnedCloudinaryAsset("", "avatars", USER_ID)).toBe(false);
+    expect(isOwnedCloudinaryAsset(undefined as unknown as string, "avatars", USER_ID)).toBe(false);
+  });
+
+  it("rejects a publicId that merely starts with a similar-looking prefix", () => {
+    // Guards against a naive `.includes()`-style check: this string does NOT
+    // start with "artisan-hub/avatars/<USER_ID>/" so it must be rejected.
+    expect(
+      isOwnedCloudinaryAsset(`other/artisan-hub/avatars/${USER_ID}/abc123`, "avatars", USER_ID)
+    ).toBe(false);
   });
 });

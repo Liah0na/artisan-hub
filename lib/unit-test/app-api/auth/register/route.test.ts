@@ -25,9 +25,10 @@ vi.mock("@/lib/email/send-verification-email", () => ({
 
 import { POST } from "@/app/api/auth/register/route";
 
-function makeRequest(body: unknown) {
+function makeRequest(body: unknown, headers: Record<string, string> = { origin: "https://x", host: "x" }) {
   return new Request("https://x/api/auth/register", {
     method: "POST",
+    headers,
     body: JSON.stringify(body),
   });
 }
@@ -47,6 +48,13 @@ beforeEach(() => {
 });
 
 describe("POST /api/auth/register", () => {
+  it("rejects a request from an untrusted origin with 403", async () => {
+    const res = await POST(makeRequest(validPayload(), { origin: "https://evil.example.com", host: "x" }));
+
+    expect(res.status).toBe(403);
+    expect(rateLimitMock).not.toHaveBeenCalled();
+  });
+
   it("returns 429 when the IP has exceeded the rate limit", async () => {
     rateLimitMock.mockReturnValue({ success: false, remaining: 0, resetAt: Date.now() });
 

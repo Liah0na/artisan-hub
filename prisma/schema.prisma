@@ -20,23 +20,32 @@ enum Role {
   superadmin
 }
 
+// Stores both the display URL and the Cloudinary public_id for every
+// uploaded image, so the server can delete the underlying asset later
+// (product/account deletion, avatar replacement) instead of only ever
+// being able to display it.
+type CloudinaryAsset {
+  url      String
+  publicId String
+}
+
 model User {
-  id                        String    @id @default(auto()) @map("_id") @db.ObjectId
+  id                        String           @id @default(auto()) @map("_id") @db.ObjectId
   name                      String
-  email                     String    @unique
+  email                     String           @unique
   passwordHash              String
-  role                      Role      @default(artisan)
-  avatar                    String?
+  role                      Role             @default(artisan)
+  avatar                    CloudinaryAsset?
   bio                       String?
   phone                     String?
   instagram                 String?
   location                  String?
   products                  Product[]
-  emailVerified             Boolean   @default(false)
+  emailVerified             Boolean          @default(false)
   verificationToken         String?
   verificationTokenExpires  DateTime?
-  createdAt                 DateTime  @default(now())
-  updatedAt                 DateTime  @updatedAt
+  createdAt                 DateTime         @default(now())
+  updatedAt                 DateTime         @updatedAt
 
   @@index([verificationToken])
 }
@@ -48,19 +57,25 @@ model ContactMessage {
   message   String
   read      Boolean  @default(false)
   createdAt DateTime @default(now())
+
+  // Retention policy (see docs/data-retention-and-deletion.md): read
+  // messages older than CONTACT_MESSAGE_RETENTION_DAYS are purged by
+  // scripts/purge-old-contact-messages.ts. Indexed so that maintenance
+  // query can use it efficiently.
+  @@index([read, createdAt])
 }
 
 model Product {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  artisanId   String   @db.ObjectId
-  artisan     User     @relation(fields: [artisanId], references: [id])
+  id          String            @id @default(auto()) @map("_id") @db.ObjectId
+  artisanId   String            @db.ObjectId
+  artisan     User              @relation(fields: [artisanId], references: [id])
   name        String
   description String
-  images      String[] @default([])
+  images      CloudinaryAsset[]
   price       Float
-  stock       Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  stock       Int               @default(0)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
 
   @@index([artisanId])
 }

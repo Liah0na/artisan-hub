@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 
 import { authOptions } from "@/lib/utils/auth";
 import { prisma } from "@/lib/prisma";
+import { isTrustedOrigin, originRejectedResponse } from "@/lib/utils/verify-origin";
 
 async function requireSuperAdmin() {
   const session = await getServerSession(authOptions);
@@ -12,6 +13,8 @@ async function requireSuperAdmin() {
 }
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  if (!isTrustedOrigin(request)) return originRejectedResponse();
+
   const session = await requireSuperAdmin();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
@@ -55,7 +58,9 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   return NextResponse.json(updated);
 }
 
-export async function DELETE(_request: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  if (!isTrustedOrigin(request)) return originRejectedResponse();
+
   const session = await requireSuperAdmin();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 

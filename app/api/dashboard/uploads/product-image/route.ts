@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 
 import { authOptions } from "@/lib/utils/auth";
 import { cloudinary } from "@/lib/utils/cloudinary.server";
+import { isTrustedOrigin, originRejectedResponse } from "@/lib/utils/verify-origin";
 
 export const runtime = "nodejs";
 
@@ -10,6 +11,8 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const ACCEPTED_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
 
 export async function POST(request: Request) {
+  if (!isTrustedOrigin(request)) return originRejectedResponse();
+
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {

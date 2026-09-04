@@ -8,7 +8,7 @@ vi.mock("next-auth", () => ({
   getServerSession: (...args: unknown[]) => getServerSessionMock(...args),
 }));
 
-vi.mock("@/auth", () => ({ authOptions: {} }));
+vi.mock("@/lib/utils/auth", () => ({ authOptions: {} }));
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
@@ -21,9 +21,19 @@ vi.mock("@/lib/prisma", () => ({
 
 import { GET, POST } from "@/app/api/dashboard/products/route";
 
-function makeRequest(body: unknown) {
+const ARTISAN_ID = "artisan-1";
+const OWNED_IMAGE = {
+  url: "https://res.cloudinary.com/demo/image/upload/artisan-hub/products/artisan-1/vaso1",
+  publicId: "artisan-hub/products/artisan-1/vaso1",
+};
+
+function makeRequest(body: unknown, withOrigin = true) {
   return new Request("https://x/api/dashboard/products", {
     method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(withOrigin ? { origin: "https://x", host: "x" } : {}),
+    },
     body: JSON.stringify(body),
   });
 }
@@ -32,7 +42,7 @@ function validProduct(overrides: Record<string, unknown> = {}) {
   return {
     name: "Vaso de cerâmica",
     description: "Feito à mão",
-    images: ["products/vaso1.jpg"],
+    images: [OWNED_IMAGE],
     price: 120,
     stock: 3,
     ...overrides,
@@ -54,7 +64,7 @@ describe("GET /api/dashboard/products", () => {
   });
 
   it("returns only the current artisan's products", async () => {
-    getServerSessionMock.mockResolvedValueOnce({ user: { id: "artisan-1" } });
+    getServerSessionMock.mockResolvedValueOnce({ user: { id: ARTISAN_ID } });
     findManyMock.mockResolvedValueOnce([{ id: "p1" }]);
 
     const res = await GET();
@@ -62,13 +72,21 @@ describe("GET /api/dashboard/products", () => {
     expect(res.status).toBe(200);
     expect(await res.json()).toEqual({ products: [{ id: "p1" }] });
     expect(findManyMock).toHaveBeenCalledWith({
-      where: { artisanId: "artisan-1" },
+      where: { artisanId: ARTISAN_ID },
       orderBy: { createdAt: "desc" },
     });
   });
 });
 
 describe("POST /api/dashboard/products", () => {
+  it("returns 403 when the request's Origin doesn't match its Host (CSRF protection)", async () => {
+    const res = await POST(makeRequest(validProduct(), false));
+
+    expect(res.status).toBe(403);
+    expect(createMock).not.toHaveBeenCalled();
+    expect(getServerSessionMock).not.toHaveBeenCalled();
+  });
+
   it("returns 401 without a session", async () => {
     getServerSessionMock.mockResolvedValueOnce(null);
 
@@ -79,27 +97,30 @@ describe("POST /api/dashboard/products", () => {
   });
 
   it("creates a product scoped to the session's artisan id", async () => {
-    getServerSessionMock.mockResolvedValueOnce({ user: { id: "artisan-1" } });
+    getServerSessionMock.mockResolvedValueOnce({ user: { id: ARTISAN_ID } });
     createMock.mockResolvedValueOnce({ id: "p1", ...validProduct() });
 
     const res = await POST(makeRequest(validProduct()));
 
     expect(res.status).toBe(201);
     expect(createMock).toHaveBeenCalledWith({
-      data: { ...validProduct(), artisanId: "artisan-1" },
+      data: { ...validProduct(), artisanId: ARTISAN_ID },
     });
   });
 
   it.each([
     ["missing name", { name: "" }],
+    ["name too long", { name: "a".repeat(121) }],
     ["missing description", { description: "" }],
+    ["description too long", { description: "a".repeat(4001) }],
     ["no images", { images: [] }],
+    ["more than 6 images", { images: Array(7).fill(OWNED_IMAGE) }],
     ["negative price", { price: -5 }],
     ["non-numeric price", { price: "not-a-number" }],
     ["non-integer stock", { stock: 1.5 }],
     ["negative stock", { stock: -1 }],
   ])("rejects with 400 for %s", async (_label, overrides) => {
-    getServerSessionMock.mockResolvedValueOnce({ user: { id: "artisan-1" } });
+    getServerSessionMock.mockResolvedValueOnce({ user: { id: ARTISAN_ID } });
 
     const res = await POST(makeRequest(validProduct(overrides)));
 
@@ -107,14 +128,27 @@ describe("POST /api/dashboard/products", () => {
     expect(createMock).not.toHaveBeenCalled();
   });
 
-  it("filters out blank/non-string entries from the images array", async () => {
-    getServerSessionMock.mockResolvedValueOnce({ user: { id: "artisan-1" } });
-    createMock.mockResolvedValueOnce({ id: "p1" });
+  it("rejects an image whose publicId doesn't belong to the current artisan (ownership check)", async () => {
+    getServerSessionMock.mockResolvedValueOnce({ user: { id: ARTISAN_ID } });
 
-    await POST(makeRequest(validProduct({ images: ["a.jpg", "", "  ", 42, "b.jpg"] })));
+    const res = await POST(
+      makeRequest(
+        validProduct({
+          images: [{ url: "https://x/y.jpg", publicId: "artisan-hub/products/someone-else/y" }],
+        })
+      )
+    );
 
-    expect(createMock).toHaveBeenCalledWith({
-      data: expect.objectContaining({ images: ["a.jpg", "b.jpg"] }),
-    });
+    expect(res.status).toBe(400);
+    expect(createMock).not.toHaveBeenCalled();
+  });
+
+  it("rejects an image object missing a publicId (plain URL strings are no longer accepted)", async () => {
+    getServerSessionMock.mockResolvedValueOnce({ user: { id: ARTISAN_ID } });
+
+    const res = await POST(makeRequest(validProduct({ images: ["products/vaso1.jpg"] })));
+
+    expect(res.status).toBe(400);
+    expect(createMock).not.toHaveBeenCalled();
   });
 });

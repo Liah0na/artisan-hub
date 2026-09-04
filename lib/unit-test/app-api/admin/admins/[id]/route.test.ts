@@ -37,6 +37,7 @@ function makeParams(id: string) {
 function makeRequest(body: unknown) {
   return new Request(`https://x/api/admin/admins/${TARGET_ID}`, {
     method: "PATCH",
+    headers: { origin: "https://x", host: "x" },
     body: JSON.stringify(body),
   });
 }
@@ -157,7 +158,7 @@ describe("DELETE /api/admin/admins/[id]", () => {
   it("returns 401 without a superadmin session", async () => {
     getServerSessionMock.mockResolvedValueOnce({ user: { role: "admin" } });
 
-    const res = await DELETE(new Request("https://x"), makeParams(TARGET_ID));
+    const res = await DELETE(new Request("https://x", { method: "DELETE", headers: { origin: "https://x", host: "x" } }), makeParams(TARGET_ID));
 
     expect(res.status).toBe(401);
     expect(deleteMock).not.toHaveBeenCalled();
@@ -167,7 +168,7 @@ describe("DELETE /api/admin/admins/[id]", () => {
     getServerSessionMock.mockResolvedValueOnce({ user: { role: "superadmin" } });
     findUniqueMock.mockResolvedValueOnce({ id: TARGET_ID, role: "superadmin" });
 
-    const res = await DELETE(new Request("https://x"), makeParams(TARGET_ID));
+    const res = await DELETE(new Request("https://x", { method: "DELETE", headers: { origin: "https://x", host: "x" } }), makeParams(TARGET_ID));
 
     expect(res.status).toBe(403);
     expect(deleteMock).not.toHaveBeenCalled();
@@ -178,7 +179,7 @@ describe("DELETE /api/admin/admins/[id]", () => {
     findUniqueMock.mockResolvedValueOnce({ id: TARGET_ID, role: "admin" });
     deleteMock.mockResolvedValueOnce({});
 
-    const res = await DELETE(new Request("https://x"), makeParams(TARGET_ID));
+    const res = await DELETE(new Request("https://x", { method: "DELETE", headers: { origin: "https://x", host: "x" } }), makeParams(TARGET_ID));
 
     expect(res.status).toBe(200);
     expect(deleteMock).toHaveBeenCalledWith({ where: { id: TARGET_ID } });

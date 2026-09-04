@@ -12,9 +12,19 @@ export async function sendVerificationEmail(email: string, token: string) {
   // Dev / not-yet-configured fallback: log the link instead of failing the
   // signup flow. Set RESEND_API_KEY in .env to actually send emails.
   if (!resend) {
-    console.warn(
-      `[email] RESEND_API_KEY não configurada. Link de verificação para ${email}:\n${verifyUrl}`
-    );
+    if (process.env.NODE_ENV === "production") {
+      // Never log the raw token/verification link in production — anyone
+      // with read access to server logs could use it to verify (and take
+      // over) an unrelated account. Log only that email sending is
+      // misconfigured so it gets noticed operationally.
+      console.error(
+        `[email] RESEND_API_KEY não configurada em produção. Não foi possível enviar o e-mail de verificação para ${email}.`
+      );
+    } else {
+      console.warn(
+        `[email] RESEND_API_KEY não configurada. Link de verificação para ${email}:\n${verifyUrl}`
+      );
+    }
     return;
   }
 

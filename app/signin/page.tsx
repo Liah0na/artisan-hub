@@ -35,6 +35,21 @@ function SigninForm() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showResend, setShowResend] = useState(false);
+  const [resendStatus, setResendStatus] = useState<"idle" | "sending" | "sent">("idle");
+
+  async function handleResend() {
+    setResendStatus("sending");
+    try {
+      await fetch("/api/auth/resend-verification", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email.trim().toLowerCase() }),
+      });
+    } finally {
+      setResendStatus("sent");
+    }
+  }
 
   async function handleSubmit(
     event: React.FormEvent<HTMLFormElement>
@@ -52,11 +67,13 @@ function SigninForm() {
 
       if (result?.error === "EmailNotVerified") {
         setError("Confirme seu e-mail antes de entrar. Verifique sua caixa de entrada.");
+        setShowResend(true);
         return;
       }
 
       if (result?.error) {
         setError("E-mail ou senha inválidos.");
+        setShowResend(false);
         return;
       }
 
@@ -167,6 +184,25 @@ function SigninForm() {
               <p className="rounded-md border border-red-500/30 bg-red-50 px-4 py-3 text-sm text-red-600">
                 {error}
               </p>
+            )}
+
+            {showResend && (
+              <div className="text-sm">
+                {resendStatus === "sent" ? (
+                  <p className="text-black/70">
+                    Se a conta existir e ainda não estiver confirmada, enviamos um novo link de confirmação.
+                  </p>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleResend}
+                    disabled={resendStatus === "sending"}
+                    className="font-medium underline disabled:opacity-60"
+                  >
+                    {resendStatus === "sending" ? "Enviando..." : "Reenviar e-mail de confirmação"}
+                  </button>
+                )}
+              </div>
             )}
 
             <button

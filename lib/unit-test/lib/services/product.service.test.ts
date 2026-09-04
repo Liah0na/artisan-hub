@@ -27,7 +27,7 @@ function makeProduct(overrides: Partial<Record<string, unknown>> = {}) {
     artisanId: VALID_ARTISAN_ID,
     name: "Vaso de cerâmica",
     description: "Feito à mão",
-    images: ["products/vaso1.jpg"],
+    images: [{ url: "https://res.cloudinary.com/test-cloud/image/upload/products/vaso1.jpg", publicId: "artisan-hub/products/507f191e810c19729de860ea/vaso1" }],
     price: 120,
     stock: 3,
     createdAt: new Date("2026-01-15T10:00:00.000Z"),
@@ -39,7 +39,6 @@ function makeArtisan(overrides: Partial<Record<string, unknown>> = {}) {
   return {
     id: VALID_ARTISAN_ID,
     name: "Ana Artesã",
-    email: "ana@example.com",
     avatar: null,
     bio: "Ceramista há 10 anos",
     phone: null,
@@ -102,6 +101,42 @@ describe("getProductById", () => {
       orderBy: { createdAt: "desc" },
       take: 4,
     });
+  });
+
+  it("only selects public artisan fields (never email) via the include", async () => {
+    const product = makeProduct({ artisan: makeArtisan() });
+    findUniqueMock.mockResolvedValueOnce(product);
+    findManyMock.mockResolvedValueOnce([]);
+
+    await getProductById(VALID_ID);
+
+    expect(findUniqueMock).toHaveBeenCalledWith({
+      where: { id: VALID_ID },
+      include: {
+        artisan: {
+          select: {
+            id: true,
+            name: true,
+            avatar: true,
+            bio: true,
+            phone: true,
+            instagram: true,
+            location: true,
+            createdAt: true,
+          },
+        },
+      },
+    });
+  });
+
+  it("never exposes the artisan's email on the mapped product", async () => {
+    const product = makeProduct({ artisan: makeArtisan() });
+    findUniqueMock.mockResolvedValueOnce(product);
+    findManyMock.mockResolvedValueOnce([]);
+
+    const result = await getProductById(VALID_ID);
+
+    expect(result!.artisan).not.toHaveProperty("email");
   });
 });
 

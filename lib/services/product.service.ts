@@ -5,11 +5,26 @@ import { Artisan } from "@/lib/types/artisan";
 
 const OBJECT_ID_RE = /^[a-f\d]{24}$/i;
 
-type ArtisanRecord = {
+// Same public/private split as artisan.service.ts (item #2): products are
+// public, but the artisan relation embedded in a product response must
+// only carry public fields — never email.
+const PUBLIC_ARTISAN_SELECT = {
+  id: true,
+  name: true,
+  avatar: true,
+  bio: true,
+  phone: true,
+  instagram: true,
+  location: true,
+  createdAt: true,
+} as const;
+
+type CloudinaryAssetRecord = { url: string; publicId: string };
+
+type PublicArtisanRecord = {
   id: string;
   name: string;
-  email: string;
-  avatar: string | null;
+  avatar: CloudinaryAssetRecord | null;
   bio: string | null;
   phone: string | null;
   instagram: string | null;
@@ -22,7 +37,7 @@ function mapProduct(product: {
   artisanId: string;
   name: string;
   description: string;
-  images: string[];
+  images: CloudinaryAssetRecord[];
   price: number;
   stock: number;
   createdAt: Date;
@@ -32,19 +47,18 @@ function mapProduct(product: {
     artisanId: product.artisanId,
     name: product.name,
     description: product.description,
-    images: product.images.map((url) => buildCloudinaryUrl(url, 1000)),
+    images: product.images.map((image) => buildCloudinaryUrl(image.publicId, 1000)),
     price: product.price,
     stock: product.stock,
     createdAt: product.createdAt.toISOString(),
   };
 }
 
-function mapArtisan(user: ArtisanRecord): Artisan {
+function mapArtisan(user: PublicArtisanRecord): Artisan {
   return {
     id: user.id,
     name: user.name,
-    email: user.email,
-    avatar: user.avatar ? buildCloudinaryUrl(user.avatar, 1000) : null,
+    avatar: user.avatar ? buildCloudinaryUrl(user.avatar.publicId, 1000) : null,
     bio: user.bio,
     phone: user.phone,
     instagram: user.instagram,
@@ -58,7 +72,7 @@ export async function getProductById(id: string) {
 
   const product = await prisma.product.findUnique({
     where: { id },
-    include: { artisan: true },
+    include: { artisan: { select: PUBLIC_ARTISAN_SELECT } },
   });
   if (!product) return null;
 
@@ -80,6 +94,7 @@ export async function getAllProducts(limit?: number): Promise<Product[]> {
     orderBy: { createdAt: "desc" },
     ...(limit ? { take: limit } : {})
   });
+  
   return products.map(mapProduct);
 }
 

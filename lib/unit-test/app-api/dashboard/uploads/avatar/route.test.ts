@@ -22,6 +22,7 @@ function makeFormRequest(file?: File) {
   if (file) formData.set("file", file);
   return new Request("https://x/api/dashboard/uploads/avatar", {
     method: "POST",
+    headers: { origin: "https://x", host: "x" },
     body: formData,
   });
 }

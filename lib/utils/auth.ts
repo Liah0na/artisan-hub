@@ -28,7 +28,12 @@ export const authOptions: NextAuthOptions = {
 
         if (!validPassword) return null;
 
-        if (!user.emailVerified) {
+        // Only artisans go through self-signup + email verification. Admins
+        // and the superadmin are created directly by a trusted operator
+        // (via the admin panel or the bootstrap endpoint) and always have
+        // emailVerified set to true at creation time — this check exists
+        // only as defense-in-depth in case that ever isn't the case.
+        if (user.role === "artisan" && !user.emailVerified) {
           throw new Error("EmailNotVerified");
         }
 

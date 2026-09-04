@@ -71,7 +71,6 @@ describe("ProfileForm", () => {
             phone: "11999999999",
             instagram: "@maria.ceramica",
             location: "São Paulo, SP",
-            avatar: "",
           }),
         })
       )
@@ -81,11 +80,11 @@ describe("ProfileForm", () => {
     expect(screen.getByText("Perfil atualizado com sucesso.")).toBeInTheDocument();
   });
 
-  it("uploads the avatar first, then saves the profile with the returned URL", async () => {
+  it("uploads the avatar first, then saves the profile with the returned URL and publicId", async () => {
     fetchMock
       .mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ url: "https://cdn.example.com/avatar.png" }),
+        json: async () => ({ url: "https://cdn.example.com/avatar.png", publicId: "artisan-hub/avatars/u1/new" }),
       })
       .mockResolvedValueOnce({ ok: true, json: async () => ({}) });
 
@@ -104,7 +103,10 @@ describe("ProfileForm", () => {
       expect.objectContaining({ method: "POST" })
     );
     const profileCallBody = JSON.parse(fetchMock.mock.calls[1][1].body);
-    expect(profileCallBody.avatar).toBe("https://cdn.example.com/avatar.png");
+    expect(profileCallBody.avatar).toEqual({
+      url: "https://cdn.example.com/avatar.png",
+      publicId: "artisan-hub/avatars/u1/new",
+    });
   });
 
   it("rejects a disallowed avatar file type without uploading", async () => {

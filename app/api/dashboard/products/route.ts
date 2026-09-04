@@ -2,22 +2,8 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/utils/auth";
 import { prisma } from "@/lib/prisma";
-
-function validateProduct(data: Record<string, unknown>) {
-  const name = typeof data.name === "string" ? data.name.trim() : "";
-  const description = typeof data.description === "string" ? data.description.trim() : "";
-  const images = Array.isArray(data.images)
-    ? data.images.filter((url): url is string => typeof url === "string" && url.trim().length > 0)
-    : [];
-  const price = Number(data.price);
-  const stock = Number(data.stock);
-
-  if (!name || !description || images.length === 0 || !Number.isFinite(price) || price < 0 || !Number.isInteger(stock) || stock < 0) {
-    return null;
-  }
-
-  return { name, description, images, price, stock };
-}
+import { validateProduct, PRODUCT_VALIDATION_ERROR } from "@/lib/validations/product";
+import { isTrustedOrigin, originRejectedResponse } from "@/lib/utils/verify-origin";
 
 export async function GET() {
   const session = await getServerSession(authOptions);
@@ -32,12 +18,15 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  if (!isTrustedOrigin(request)) return originRejectedResponse();
+
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const product = validateProduct(await request.json());
+  const body = await request.json().catch(() => null);
+  const product = body ? validateProduct(body, session.user.id) : null;
   if (!product) {
-    return NextResponse.json({ error: "Informe nome, descrição, ao menos uma imagem, preço válido e estoque inteiro não negativo." }, { status: 400 });
+    return NextResponse.json({ error: PRODUCT_VALIDATION_ERROR }, { status: 400 });
   }
 
   const createdProduct = await prisma.product.create({

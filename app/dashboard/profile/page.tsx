@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/utils/auth";
 import { prisma } from "@/lib/prisma";
 import ProfileForm from "@/components/layout/dashboard/ProfileForm";
+import DeleteAccountForm from "@/components/layout/dashboard/DeleteAccountForm";
 
 export default async function ProfilePage() {
   const session = await getServerSession(authOptions);
@@ -63,7 +64,7 @@ export default async function ProfilePage() {
                 >
                   <div className="relative aspect-square bg-gray-50">
                     {product.images[0] ? (
-                      <Image src={product.images[0]} alt={product.name} fill unoptimized className="object-cover" />
+                      <Image src={product.images[0].url} alt={product.name} fill unoptimized className="object-cover" />
                     ) : (
                       <div className="flex h-full w-full items-center justify-center text-xs text-gray-400">Sem imagem</div>
                     )}
@@ -81,6 +82,8 @@ export default async function ProfilePage() {
           </>
         )}
       </section>
+
+      {user.role !== "superadmin" && <DeleteAccountForm />}
     </div>
   );
 }

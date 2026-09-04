@@ -6,11 +6,14 @@ import { signupSchema } from "@/lib/validations/auth";
 import { getClientIp, rateLimit } from "@/lib/rate-limit";
 import { generateVerificationToken } from "@/lib/tokens";
 import { sendVerificationEmail } from "@/lib/email/send-verification-email";
+import { isTrustedOrigin, originRejectedResponse } from "@/lib/utils/verify-origin";
 
 const SIGNUP_LIMIT = 5;
 const SIGNUP_WINDOW_MS = 60 * 60 * 1000; // 1 hour per IP
 
 export async function POST(request: Request) {
+  if (!isTrustedOrigin(request)) return originRejectedResponse();
+
   try {
     const ip = getClientIp(request);
     const { success } = rateLimit(`signup:${ip}`, SIGNUP_LIMIT, SIGNUP_WINDOW_MS);

@@ -8,8 +8,10 @@ const MAX_IMAGES = 6;
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const ACCEPTED_TYPES = /^image\/(jpeg|png|webp)$/;
 
+type ImageAsset = { url: string; publicId: string };
+
 type ImageItem =
-  | { key: string; kind: "existing"; url: string }
+  | ({ key: string; kind: "existing" } & ImageAsset)
   | { key: string; kind: "new"; file: File; previewUrl: string };
 
 type ProductFormProps = {
@@ -17,7 +19,7 @@ type ProductFormProps = {
     id: string;
     name: string;
     description: string;
-    images: string[];
+    images: ImageAsset[];
     price: number;
     stock: number;
   };
@@ -36,7 +38,7 @@ export default function ProductForm({ product }: ProductFormProps) {
   const [name, setName] = useState(product?.name ?? "");
   const [description, setDescription] = useState(product?.description ?? "");
   const [images, setImages] = useState<ImageItem[]>(
-    () => (product?.images ?? []).map((url) => ({ key: makeKey(), kind: "existing" as const, url }))
+    () => (product?.images ?? []).map((image) => ({ key: makeKey(), kind: "existing" as const, ...image }))
   );
   const [price, setPrice] = useState(product?.price?.toString() ?? "");
   const [stock, setStock] = useState(product?.stock?.toString() ?? "0");
@@ -53,7 +55,7 @@ export default function ProductForm({ product }: ProductFormProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  async function uploadImage(file: File) {
+  async function uploadImage(file: File): Promise<ImageAsset> {
     const formData = new FormData();
     formData.append("file", file);
 
@@ -67,7 +69,7 @@ export default function ProductForm({ product }: ProductFormProps) {
       throw new Error(data.error || "Não foi possível enviar a imagem.");
     }
 
-    return data.url as string;
+    return { url: data.url as string, publicId: data.publicId as string };
   }
 
   function handleFilesChange(event: React.ChangeEvent<HTMLInputElement>) {
@@ -136,13 +138,12 @@ export default function ProductForm({ product }: ProductFormProps) {
     setLoading(true);
 
     try {
-      const finalImages: string[] = [];
+      const finalImages: ImageAsset[] = [];
       for (const item of images) {
         if (item.kind === "existing") {
-          finalImages.push(item.url);
+          finalImages.push({ url: item.url, publicId: item.publicId });
         } else {
-          const url = await uploadImage(item.file);
-          finalImages.push(url);
+          finalImages.push(await uploadImage(item.file));
         }
       }
 
@@ -174,11 +175,11 @@ export default function ProductForm({ product }: ProductFormProps) {
     <form onSubmit={handleSubmit} className="mt-8 max-w-2xl space-y-5 rounded-xl bg-white p-6 shadow-sm ring-1 ring-gray-200">
       <div>
         <label htmlFor="name" className="mb-2 block text-sm font-medium">Nome do produto</label>
-        <input id="name" value={name} onChange={(event) => setName(event.target.value)} required className="w-full rounded-md border px-3 py-2" />
+        <input id="name" value={name} onChange={(event) => setName(event.target.value)} required maxLength={120} className="w-full rounded-md border px-3 py-2" />
       </div>
       <div>
         <label htmlFor="description" className="mb-2 block text-sm font-medium">Descrição</label>
-        <textarea id="description" value={description} onChange={(event) => setDescription(event.target.value)} required rows={5} className="w-full rounded-md border px-3 py-2" />
+        <textarea id="description" value={description} onChange={(event) => setDescription(event.target.value)} required rows={5} maxLength={4000} className="w-full rounded-md border px-3 py-2" />
       </div>
       <div>
         <label htmlFor="images" className="mb-2 block text-sm font-medium">

@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 
 import { authOptions } from "@/lib/utils/auth";
 import { prisma } from "@/lib/prisma";
+import { isTrustedOrigin, originRejectedResponse } from "@/lib/utils/verify-origin";
 
 async function requireSuperAdmin() {
   const session = await getServerSession(authOptions);
@@ -12,6 +13,8 @@ async function requireSuperAdmin() {
 }
 
 export async function POST(request: Request) {
+  if (!isTrustedOrigin(request)) return originRejectedResponse();
+
   const session = await requireSuperAdmin();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
@@ -34,7 +37,7 @@ export async function POST(request: Request) {
 
   const passwordHash = await bcrypt.hash(password, 12);
   const admin = await prisma.user.create({
-    data: { name, email, passwordHash, role: "admin" },
+    data: { name, email, passwordHash, role: "admin", emailVerified: true },
     select: { id: true, name: true, email: true, createdAt: true },
   });
 

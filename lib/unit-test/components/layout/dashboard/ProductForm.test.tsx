@@ -26,7 +26,7 @@ const EXISTING_PRODUCT = {
   id: "p1",
   name: "Vaso de cerâmica",
   description: "Feito à mão",
-  images: ["https://cdn.example.com/vaso1.jpg"],
+  images: [{ url: "https://cdn.example.com/vaso1.jpg", publicId: "artisan-hub/products/u1/vaso1" }],
   price: 120,
   stock: 3,
 };
@@ -71,9 +71,12 @@ describe("ProductForm — create mode", () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
-  it("uploads a selected image, then POSTs the product with the uploaded URL", async () => {
+  it("uploads a selected image, then POSTs the product with the uploaded URL and publicId", async () => {
     fetchMock
-      .mockResolvedValueOnce({ ok: true, json: async () => ({ url: "https://cdn.example.com/new.jpg" }) })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ url: "https://cdn.example.com/new.jpg", publicId: "artisan-hub/products/u1/new" }),
+      })
       .mockResolvedValueOnce({ ok: true, json: async () => ({ product: { id: "new" } }) });
 
     const user = userEvent.setup({ applyAccept: false });
@@ -98,7 +101,7 @@ describe("ProductForm — create mode", () => {
       expect.objectContaining({ method: "POST" })
     );
     const body = JSON.parse(fetchMock.mock.calls[1][1].body);
-    expect(body.images).toEqual(["https://cdn.example.com/new.jpg"]);
+    expect(body.images).toEqual([{ url: "https://cdn.example.com/new.jpg", publicId: "artisan-hub/products/u1/new" }]);
 
     await waitFor(() => expect(pushMock).toHaveBeenCalledWith("/dashboard/products"));
     expect(refreshMock).toHaveBeenCalled();
@@ -192,7 +195,7 @@ describe("ProductForm — edit mode", () => {
     // no image upload call was made — the existing URL was reused
     expect(fetchMock).toHaveBeenCalledTimes(1);
     const body = JSON.parse(fetchMock.mock.calls[0][1].body);
-    expect(body.images).toEqual(["https://cdn.example.com/vaso1.jpg"]);
+    expect(body.images).toEqual([{ url: "https://cdn.example.com/vaso1.jpg", publicId: "artisan-hub/products/u1/vaso1" }]);
   });
 
   it("removes an image when 'Remover' is clicked", async () => {

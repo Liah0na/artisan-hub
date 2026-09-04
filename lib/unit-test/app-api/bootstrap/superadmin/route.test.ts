@@ -33,6 +33,7 @@ function makeRequest(secretHeader?: string) {
 beforeEach(() => {
   vi.clearAllMocks();
   bcryptHashMock.mockResolvedValue("hashed-password");
+  process.env.SUPERADMIN_BOOTSTRAP_ENABLED = "true";
   process.env.SUPERADMIN_BOOTSTRAP_SECRET = "top-secret";
   process.env.SUPERADMIN_EMAIL = "root@example.com";
   process.env.SUPERADMIN_PASSWORD = "rootPassword123";
@@ -44,6 +45,23 @@ afterEach(() => {
 });
 
 describe("POST /api/bootstrap/superadmin", () => {
+  it("returns 404 when SUPERADMIN_BOOTSTRAP_ENABLED isn't set to 'true' (endpoint disabled)", async () => {
+    delete process.env.SUPERADMIN_BOOTSTRAP_ENABLED;
+
+    const res = await POST(makeRequest("top-secret"));
+
+    expect(res.status).toBe(404);
+    expect(findFirstMock).not.toHaveBeenCalled();
+  });
+
+  it("returns 404 when SUPERADMIN_BOOTSTRAP_ENABLED is set to something other than 'true'", async () => {
+    process.env.SUPERADMIN_BOOTSTRAP_ENABLED = "false";
+
+    const res = await POST(makeRequest("top-secret"));
+
+    expect(res.status).toBe(404);
+  });
+
   it("returns 500 when the server secret isn't configured", async () => {
     delete process.env.SUPERADMIN_BOOTSTRAP_SECRET;
 
@@ -117,8 +135,14 @@ describe("POST /api/bootstrap/superadmin", () => {
         email: "root@example.com",
         passwordHash: "hashed-password",
         role: "superadmin",
+        emailVerified: true,
       },
     });
+  });
+
+  it("rejects a secret of a different length without matching content (no crash)", async () => {
+    const res = await POST(makeRequest("short"));
+    expect(res.status).toBe(401);
   });
 
   it("defaults the name to 'Super Admin' when SUPERADMIN_NAME isn't set", async () => {

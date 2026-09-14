@@ -24,6 +24,7 @@ export default async function AdminArtisansPage() {
               <tr>
                 <th className="px-5 py-3 font-medium">Nome</th>
                 <th className="px-5 py-3 font-medium">E-mail</th>
+                <th className="px-5 py-3 font-medium">Verificado</th>
                 <th className="px-5 py-3 font-medium">Localização</th>
                 <th className="px-5 py-3 font-medium">Produtos</th>
                 <th className="px-5 py-3 font-medium">Cadastro</th>
@@ -35,6 +36,20 @@ export default async function AdminArtisansPage() {
                 <tr key={artisan.id}>
                   <td className="px-5 py-4 font-medium text-gray-900">{artisan.name}</td>
                   <td className="px-5 py-4">{artisan.email}</td>
+                  <td className="px-5 py-4">
+                    <span
+                      className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium ${artisan.emailVerified
+                          ? "bg-green-100 text-green-700"
+                          : "bg-red-100 text-red-700"
+                        }`}
+                    >
+                      <span
+                        className={`h-1.5 w-1.5 rounded-full ${artisan.emailVerified ? "bg-green-500" : "bg-red-500"
+                          }`}
+                      />
+                      {artisan.emailVerified ? "Sim" : "Não"}
+                    </span>
+                  </td>
                   <td className="px-5 py-4">{artisan.location || "—"}</td>
                   <td className="px-5 py-4">{artisan._count.products}</td>
                   <td className="px-5 py-4">

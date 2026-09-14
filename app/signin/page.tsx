@@ -146,6 +146,7 @@ function SigninForm() {
               </label>
 
               <input
+                autoFocus
                 id="email"
                 name="email"
                 type="email"

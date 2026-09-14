@@ -71,13 +71,13 @@ export async function getProductById(id: string) {
   if (!OBJECT_ID_RE.test(id)) return null;
 
   const product = await prisma.product.findUnique({
-    where: { id },
+    where: { id, status: "approved" },
     include: { artisan: { select: PUBLIC_ARTISAN_SELECT } },
   });
   if (!product) return null;
 
   const relatedProducts = await prisma.product.findMany({
-    where: { artisanId: product.artisanId, id: { not: product.id } },
+    where: { artisanId: product.artisanId, id: { not: product.id }, status: "approved" },
     orderBy: { createdAt: "desc" },
     take: 4,
   });
@@ -91,6 +91,7 @@ export async function getProductById(id: string) {
 
 export async function getAllProducts(limit?: number): Promise<Product[]> {
   const products = await prisma.product.findMany({
+    where: { status: "approved" },
     orderBy: { createdAt: "desc" },
     ...(limit ? { take: limit } : {})
   });
@@ -102,7 +103,7 @@ export async function getProductsByArtisanId(artisanId: string): Promise<Product
   if (!OBJECT_ID_RE.test(artisanId)) return [];
 
   const products = await prisma.product.findMany({
-    where: { artisanId },
+    where: { artisanId, status: "approved" },
     orderBy: { createdAt: "desc" },
   });
   return products.map(mapProduct);

@@ -145,6 +145,32 @@ describe("PATCH /api/dashboard/products/[id]", () => {
 
     expect(deleteCloudinaryAssetsMock).toHaveBeenCalledWith([`artisan-hub/products/${ARTISAN_ID}/b`]);
   });
+
+  it("resets moderation status to pending when the images change (moderation)", async () => {
+    getServerSessionMock.mockResolvedValueOnce({ user: { id: ARTISAN_ID } });
+    findFirstMock.mockResolvedValueOnce({ id: PRODUCT_ID, images: [image("a")], status: "approved" });
+    updateMock.mockResolvedValueOnce({ id: PRODUCT_ID });
+
+    await PATCH(makeRequest("PATCH", validProduct({ images: [image("b")] })), makeParams(PRODUCT_ID));
+
+    expect(updateMock).toHaveBeenCalledWith({
+      where: { id: PRODUCT_ID },
+      data: { ...validProduct({ images: [image("b")] }), status: "pending", rejectionReason: null },
+    });
+  });
+
+  it("keeps the current moderation status when only non-image fields change", async () => {
+    getServerSessionMock.mockResolvedValueOnce({ user: { id: ARTISAN_ID } });
+    findFirstMock.mockResolvedValueOnce({ id: PRODUCT_ID, images: [image("a")], status: "approved" });
+    updateMock.mockResolvedValueOnce({ id: PRODUCT_ID });
+
+    await PATCH(makeRequest("PATCH", validProduct({ price: 999 })), makeParams(PRODUCT_ID));
+
+    expect(updateMock).toHaveBeenCalledWith({
+      where: { id: PRODUCT_ID },
+      data: validProduct({ price: 999 }),
+    });
+  });
 });
 
 describe("DELETE /api/dashboard/products/[id]", () => {

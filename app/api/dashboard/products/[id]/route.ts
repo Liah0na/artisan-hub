@@ -24,7 +24,18 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   const product = body ? validateProduct(body, session.user.id) : null;
   if (!product) return NextResponse.json({ error: PRODUCT_VALIDATION_ERROR }, { status: 400 });
 
-  const updatedProduct = await prisma.product.update({ where: { id }, data: product });
+  // Moderation: only re-queue for review when the actual images changed —
+  // editing price/stock/text on an already-approved product shouldn't
+  // force a new review. Compares by publicId, ignoring order.
+  const existingIds = existing.images.map((image) => image.publicId).sort();
+  const newIds = product.images.map((image) => image.publicId).sort();
+  const imagesChanged =
+    existingIds.length !== newIds.length || existingIds.some((id, i) => id !== newIds[i]);
+
+  const updatedProduct = await prisma.product.update({
+    where: { id },
+    data: imagesChanged ? { ...product, status: "pending", rejectionReason: null } : product,
+  });
 
   // Item #4/#6: any image that was on the product before but isn't in the
   // saved version anymore (removed, or replaced by a re-upload) is no

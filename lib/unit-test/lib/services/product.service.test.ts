@@ -97,7 +97,7 @@ describe("getProductById", () => {
     await getProductById(VALID_ID);
 
     expect(findManyMock).toHaveBeenCalledWith({
-      where: { artisanId: VALID_ARTISAN_ID, id: { not: VALID_ID } },
+      where: { artisanId: VALID_ARTISAN_ID, id: { not: VALID_ID }, status: "approved" },
       orderBy: { createdAt: "desc" },
       take: 4,
     });
@@ -111,7 +111,7 @@ describe("getProductById", () => {
     await getProductById(VALID_ID);
 
     expect(findUniqueMock).toHaveBeenCalledWith({
-      where: { id: VALID_ID },
+      where: { id: VALID_ID, status: "approved" },
       include: {
         artisan: {
           select: {
@@ -147,7 +147,7 @@ describe("getAllProducts", () => {
     const result = await getAllProducts();
 
     expect(result).toHaveLength(1);
-    expect(findManyMock).toHaveBeenCalledWith({ orderBy: { createdAt: "desc" } });
+    expect(findManyMock).toHaveBeenCalledWith({ where: { status: "approved" }, orderBy: { createdAt: "desc" } });
   });
 
   it("passes a take limit through to Prisma when provided", async () => {
@@ -156,6 +156,7 @@ describe("getAllProducts", () => {
     await getAllProducts(10);
 
     expect(findManyMock).toHaveBeenCalledWith({
+      where: { status: "approved" },
       orderBy: { createdAt: "desc" },
       take: 10,
     });
@@ -177,7 +178,7 @@ describe("getProductsByArtisanId", () => {
 
     expect(result).toHaveLength(1);
     expect(findManyMock).toHaveBeenCalledWith({
-      where: { artisanId: VALID_ARTISAN_ID },
+      where: { artisanId: VALID_ARTISAN_ID, status: "approved" },
       orderBy: { createdAt: "desc" },
     });
   });

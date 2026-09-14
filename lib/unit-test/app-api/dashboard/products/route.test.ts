@@ -104,7 +104,7 @@ describe("POST /api/dashboard/products", () => {
 
     expect(res.status).toBe(201);
     expect(createMock).toHaveBeenCalledWith({
-      data: { ...validProduct(), artisanId: ARTISAN_ID },
+      data: { ...validProduct(), artisanId: ARTISAN_ID, status: "pending", rejectionReason: null },
     });
   });
 

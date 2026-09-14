@@ -65,17 +65,31 @@ model ContactMessage {
   @@index([read, createdAt])
 }
 
+enum ProductStatus {
+  pending
+  approved
+  rejected
+}
+
 model Product {
-  id          String            @id @default(auto()) @map("_id") @db.ObjectId
-  artisanId   String            @db.ObjectId
-  artisan     User              @relation(fields: [artisanId], references: [id])
-  name        String
-  description String
-  images      CloudinaryAsset[]
-  price       Float
-  stock       Int               @default(0)
-  createdAt   DateTime          @default(now())
-  updatedAt   DateTime          @updatedAt
+  id              String            @id @default(auto()) @map("_id") @db.ObjectId
+  artisanId       String            @db.ObjectId
+  artisan         User              @relation(fields: [artisanId], references: [id])
+  name            String
+  description     String
+  images          CloudinaryAsset[]
+  price           Float
+  stock           Int               @default(0)
+  // Moderation: defaults to "approved" so existing documents created before
+  // this field existed (which don't have it stored in MongoDB) keep
+  // displaying normally. New products are always created with an explicit
+  // "pending" status in the API route — the schema default here only
+  // covers legacy/missing data, it is never relied on for new writes.
+  status          ProductStatus     @default(approved)
+  rejectionReason String?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
 
   @@index([artisanId])
+  @@index([status])
 }

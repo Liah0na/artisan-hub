@@ -247,6 +247,11 @@ export default function ProductForm({ product }: ProductFormProps) {
         </div>
       </div>
       {error && <p className="rounded-md border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
+      <p className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+        {product
+          ? "Se você alterar as imagens, o produto volta para análise antes de reaparecer no catálogo público."
+          : "Após criado, seu produto passa por uma breve revisão antes de aparecer no catálogo público."}
+      </p>
       <div className="flex gap-3">
         <button disabled={loading} className="rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-60">
           {loading ? "Salvando..." : product ? "Salvar alterações" : "Criar produto"}

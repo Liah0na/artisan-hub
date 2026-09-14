@@ -29,8 +29,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: PRODUCT_VALIDATION_ERROR }, { status: 400 });
   }
 
+  // Moderation: every new product starts as "pending" regardless of the
+  // schema-level default (which only exists for legacy documents — see
+  // schema.prisma). It only becomes publicly visible once an admin
+  // approves it from /admin/products.
   const createdProduct = await prisma.product.create({
-    data: { ...product, artisanId: session.user.id },
+    data: { ...product, artisanId: session.user.id, status: "pending", rejectionReason: null },
   });
 
   return NextResponse.json({ product: createdProduct }, { status: 201 });

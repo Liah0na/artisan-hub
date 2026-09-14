@@ -21,7 +21,7 @@ export default async function AdminProductsPage() {
       stock: product.stock,
       status: product.status,
       rejectionReason: product.rejectionReason,
-      thumbnail: product.images[0] ? buildCloudinaryUrl(product.images[0].publicId, 200) : null,
+      images: product.images.map((image) => buildCloudinaryUrl(image.publicId, 1000)),
     }))
     .sort((a, b) => STATUS_ORDER[a.status] - STATUS_ORDER[b.status]);
 

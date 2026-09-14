@@ -54,7 +54,7 @@ export async function getArtisanById(id: string): Promise<Artisan | null> {
 
 export async function getArtisans(limit?: number): Promise<Artisan[]> {
   const users = await prisma.user.findMany({
-    where: { role: "artisan" },
+    where: { role: "artisan", emailVerified: true },
     orderBy: { createdAt: "desc" },
     select: PUBLIC_ARTISAN_SELECT,
     ...(limit ? { take: limit } : {}),

@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/utils/auth";
 import { prisma } from "@/lib/prisma";
 import { validateProfile, PROFILE_VALIDATION_ERROR } from "@/lib/validations/profile";
-import { deleteCloudinaryAsset } from "@/lib/utils/cloudinary.server";
+import { deleteOrphanedCloudinaryAsset } from "@/lib/services/media.service";
 import { isTrustedOrigin, originRejectedResponse } from "@/lib/utils/verify-origin";
 
 // This is the account owner's own private view of their profile — unlike
@@ -70,10 +70,12 @@ export async function PATCH(request: Request) {
   });
 
   // Item #6: if the avatar was replaced or removed, the old Cloudinary
-  // asset is no longer referenced by anything — delete it, unless it's
-  // literally the same asset that was just re-submitted unchanged.
+  // asset is no longer referenced by THIS user — but before deleting it,
+  // deleteOrphanedCloudinaryAsset re-checks that no other product or user
+  // still references the same publicId, unless it's literally the same
+  // asset that was just re-submitted unchanged.
   if (avatarChanging && previousAvatarPublicId && previousAvatarPublicId !== profile.avatar?.publicId) {
-    await deleteCloudinaryAsset(previousAvatarPublicId);
+    await deleteOrphanedCloudinaryAsset(previousAvatarPublicId, { excludeUserId: session.user.id });
   }
 
   return NextResponse.json(updated);

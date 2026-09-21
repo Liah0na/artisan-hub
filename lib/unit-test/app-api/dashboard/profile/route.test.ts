@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 const getServerSessionMock = vi.fn();
 const findUniqueMock = vi.fn();
 const updateMock = vi.fn();
-const deleteCloudinaryAssetMock = vi.fn();
+const deleteOrphanedCloudinaryAssetMock = vi.fn();
 
 vi.mock("next-auth", () => ({
   getServerSession: (...args: unknown[]) => getServerSessionMock(...args),
@@ -20,8 +20,8 @@ vi.mock("@/lib/prisma", () => ({
   },
 }));
 
-vi.mock("@/lib/utils/cloudinary.server", () => ({
-  deleteCloudinaryAsset: (...args: unknown[]) => deleteCloudinaryAssetMock(...args),
+vi.mock("@/lib/services/media.service", () => ({
+  deleteOrphanedCloudinaryAsset: (...args: unknown[]) => deleteOrphanedCloudinaryAssetMock(...args),
 }));
 
 import { GET, PATCH } from "@/app/api/dashboard/profile/route";
@@ -152,7 +152,7 @@ describe("PATCH /api/dashboard/profile", () => {
       },
       select: PRIVATE_SELECT,
     });
-    expect(deleteCloudinaryAssetMock).not.toHaveBeenCalled();
+    expect(deleteOrphanedCloudinaryAssetMock).not.toHaveBeenCalled();
   });
 
   it("returns 400 for an unparseable JSON body", async () => {
@@ -195,7 +195,10 @@ describe("PATCH /api/dashboard/profile", () => {
     expect(updateMock).toHaveBeenCalledWith(
       expect.objectContaining({ data: expect.objectContaining({ avatar: newAvatar }) })
     );
-    expect(deleteCloudinaryAssetMock).toHaveBeenCalledWith(`artisan-hub/avatars/${USER_ID}/old`);
+    expect(deleteOrphanedCloudinaryAssetMock).toHaveBeenCalledWith(
+      `artisan-hub/avatars/${USER_ID}/old`,
+      { excludeUserId: USER_ID }
+    );
   });
 
   it("removes the avatar (avatar: null) and deletes the previous Cloudinary asset", async () => {
@@ -209,7 +212,10 @@ describe("PATCH /api/dashboard/profile", () => {
     expect(updateMock).toHaveBeenCalledWith(
       expect.objectContaining({ data: expect.objectContaining({ avatar: null }) })
     );
-    expect(deleteCloudinaryAssetMock).toHaveBeenCalledWith(`artisan-hub/avatars/${USER_ID}/old`);
+    expect(deleteOrphanedCloudinaryAssetMock).toHaveBeenCalledWith(
+      `artisan-hub/avatars/${USER_ID}/old`,
+      { excludeUserId: USER_ID }
+    );
   });
 
   it("does not delete anything from Cloudinary when there was no previous avatar", async () => {
@@ -220,6 +226,6 @@ describe("PATCH /api/dashboard/profile", () => {
     const newAvatar = { url: "https://cdn/new.jpg", publicId: `artisan-hub/avatars/${USER_ID}/new` };
     await PATCH(makeRequest({ name: "Maria", avatar: newAvatar }));
 
-    expect(deleteCloudinaryAssetMock).not.toHaveBeenCalled();
+    expect(deleteOrphanedCloudinaryAssetMock).not.toHaveBeenCalled();
   });
 });

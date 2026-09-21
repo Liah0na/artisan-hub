@@ -11,9 +11,13 @@ export { cloudinary };
 /**
  * Best-effort delete of a single Cloudinary asset. Failures are logged but
  * never thrown — a Cloudinary hiccup should never block a product/account
- * deletion that has already committed in the database. Called whenever a
- * stored image stops being referenced (removed from a product, avatar
- * replaced/removed, product deleted, account deleted).
+ * deletion that has already committed in the database.
+ *
+ * This is a low-level primitive: it does NOT check whether the publicId is
+ * still referenced by another Product/User in the database. Any call site
+ * cleaning up an image because a product/profile stopped referencing it
+ * should go through deleteOrphanedCloudinaryAsset(s) in
+ * lib/services/media.service.ts instead, which does that check first.
  */
 export async function deleteCloudinaryAsset(publicId: string | null | undefined) {
   if (!publicId) return;

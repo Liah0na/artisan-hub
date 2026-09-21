@@ -6,7 +6,7 @@ const findManyMock = vi.fn();
 const deleteManyMock = vi.fn();
 const deleteMock = vi.fn();
 const bcryptCompareMock = vi.fn();
-const deleteCloudinaryAssetsMock = vi.fn();
+const deleteOrphanedCloudinaryAssetsMock = vi.fn();
 
 vi.mock("next-auth", () => ({
   getServerSession: (...args: unknown[]) => getServerSessionMock(...args),
@@ -31,8 +31,8 @@ vi.mock("@/lib/prisma", () => ({
   },
 }));
 
-vi.mock("@/lib/utils/cloudinary.server", () => ({
-  deleteCloudinaryAssets: (...args: unknown[]) => deleteCloudinaryAssetsMock(...args),
+vi.mock("@/lib/services/media.service", () => ({
+  deleteOrphanedCloudinaryAssets: (...args: unknown[]) => deleteOrphanedCloudinaryAssetsMock(...args),
 }));
 
 import { DELETE } from "@/app/api/dashboard/account/route";
@@ -128,10 +128,10 @@ describe("DELETE /api/dashboard/account", () => {
 
     // DB deletes must happen before the Cloudinary cleanup call.
     expect(deleteManyMock.mock.invocationCallOrder[0]).toBeLessThan(
-      deleteCloudinaryAssetsMock.mock.invocationCallOrder[0]
+      deleteOrphanedCloudinaryAssetsMock.mock.invocationCallOrder[0]
     );
 
-    expect(deleteCloudinaryAssetsMock).toHaveBeenCalledWith([
+    expect(deleteOrphanedCloudinaryAssetsMock).toHaveBeenCalledWith([
       `artisan-hub/avatars/${USER_ID}/a`,
       `artisan-hub/products/${USER_ID}/p1`,
       `artisan-hub/products/${USER_ID}/p2`,
@@ -146,6 +146,6 @@ describe("DELETE /api/dashboard/account", () => {
 
     await DELETE(makeRequest({ password: "senha1234" }));
 
-    expect(deleteCloudinaryAssetsMock).toHaveBeenCalledWith([]);
+    expect(deleteOrphanedCloudinaryAssetsMock).toHaveBeenCalledWith([]);
   });
 });

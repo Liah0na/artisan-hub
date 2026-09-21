@@ -4,7 +4,7 @@ const getServerSessionMock = vi.fn();
 const findFirstMock = vi.fn();
 const updateMock = vi.fn();
 const deleteMock = vi.fn();
-const deleteCloudinaryAssetsMock = vi.fn();
+const deleteOrphanedCloudinaryAssetsMock = vi.fn();
 
 vi.mock("next-auth", () => ({
   getServerSession: (...args: unknown[]) => getServerSessionMock(...args),
@@ -22,8 +22,8 @@ vi.mock("@/lib/prisma", () => ({
   },
 }));
 
-vi.mock("@/lib/utils/cloudinary.server", () => ({
-  deleteCloudinaryAssets: (...args: unknown[]) => deleteCloudinaryAssetsMock(...args),
+vi.mock("@/lib/services/media.service", () => ({
+  deleteOrphanedCloudinaryAssets: (...args: unknown[]) => deleteOrphanedCloudinaryAssetsMock(...args),
 }));
 
 import { PATCH, DELETE } from "@/app/api/dashboard/products/[id]/route";
@@ -133,7 +133,7 @@ describe("PATCH /api/dashboard/products/[id]", () => {
       where: { id: PRODUCT_ID },
       data: validProduct(),
     });
-    expect(deleteCloudinaryAssetsMock).not.toHaveBeenCalled();
+    expect(deleteOrphanedCloudinaryAssetsMock).not.toHaveBeenCalled();
   });
 
   it("deletes from Cloudinary any image that was removed/replaced in the update (item #4/#6)", async () => {
@@ -143,7 +143,10 @@ describe("PATCH /api/dashboard/products/[id]", () => {
 
     await PATCH(makeRequest("PATCH", validProduct({ images: [image("a")] })), makeParams(PRODUCT_ID));
 
-    expect(deleteCloudinaryAssetsMock).toHaveBeenCalledWith([`artisan-hub/products/${ARTISAN_ID}/b`]);
+    expect(deleteOrphanedCloudinaryAssetsMock).toHaveBeenCalledWith(
+      [`artisan-hub/products/${ARTISAN_ID}/b`],
+      { excludeProductId: PRODUCT_ID }
+    );
   });
 
   it("resets moderation status to pending when the images change (moderation)", async () => {
@@ -209,9 +212,9 @@ describe("DELETE /api/dashboard/products/[id]", () => {
 
     expect(res.status).toBe(204);
     expect(deleteMock).toHaveBeenCalledWith({ where: { id: PRODUCT_ID } });
-    expect(deleteCloudinaryAssetsMock).toHaveBeenCalledWith([
-      `artisan-hub/products/${ARTISAN_ID}/a`,
-      `artisan-hub/products/${ARTISAN_ID}/b`,
-    ]);
+    expect(deleteOrphanedCloudinaryAssetsMock).toHaveBeenCalledWith(
+      [`artisan-hub/products/${ARTISAN_ID}/a`, `artisan-hub/products/${ARTISAN_ID}/b`],
+      { excludeProductId: PRODUCT_ID }
+    );
   });
 });

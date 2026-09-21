@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import bcrypt from "bcryptjs";
 import { authOptions } from "@/lib/utils/auth";
 import { prisma } from "@/lib/prisma";
-import { deleteCloudinaryAssets } from "@/lib/utils/cloudinary.server";
+import { deleteOrphanedCloudinaryAssets } from "@/lib/services/media.service";
 import { isTrustedOrigin, originRejectedResponse } from "@/lib/utils/verify-origin";
 
 // Item #5/#16: self-service account deletion.
@@ -71,7 +71,13 @@ export async function DELETE(request: Request) {
 
   const productImagePublicIds = products.flatMap((product) => product.images.map((image) => image.publicId));
   const avatarPublicId = user.avatar?.publicId;
-  await deleteCloudinaryAssets(avatarPublicId ? [avatarPublicId, ...productImagePublicIds] : productImagePublicIds);
+  // Both the user and their products are already gone from the database at
+  // this point, so this is really just a final safety net: confirm no
+  // *unrelated* product/user out there happens to reference the same
+  // publicId before deleting it from Cloudinary.
+  await deleteOrphanedCloudinaryAssets(
+    avatarPublicId ? [avatarPublicId, ...productImagePublicIds] : productImagePublicIds
+  );
 
   return NextResponse.json({ ok: true });
 }

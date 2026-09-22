@@ -5,6 +5,7 @@
   --color-white: #F9F9F9;
   --color-dark-gray: #1A1A1A;
   --color-navbar: #DEC18C;
+  --color-navy: #0055CC;
   --color-secondary: #CEA18C;
   --color-hover: #D3BE97;
   --color-dark: #987667;
@@ -48,8 +49,7 @@ nav.navbar {
 }
 
 .hover\:hover-primary:hover {
-  color: var(--color-secondary);
-  font-weight: bold;
+  color: var(--color-navy);
 }
 
 .display-logo {

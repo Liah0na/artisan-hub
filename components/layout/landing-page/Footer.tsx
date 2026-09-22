@@ -13,8 +13,9 @@ const Footer = () => {
           </section>
           <ul>
             <li><a href="#" className="mx-2 text-gray-400 hover:hover-primary transition-colors duration-300">Sobre nós</a></li>
-            <li><a href="#" className="mx-2 text-gray-400 hover:hover-primary transition-colors duration-300">Política de Privacidade</a></li>
-            <li><a href="#" className="mx-2 text-gray-400 hover:hover-primary transition-colors duration-300">Termos de Serviço</a></li>
+            <li><a href="/privacy" className="mx-2 text-gray-400 hover:hover-primary transition-colors duration-300">Política de Privacidade</a></li>
+            <li><a href="/terms" className="mx-2 text-gray-400 hover:hover-primary transition-colors duration-300">Termos de Serviço</a></li>
+            <li><a href="/cookies" className="mx-2 text-gray-400 hover:hover-primary transition-colors duration-300">Política de Cookies</a></li>
             <li><a href="/contact" className="mx-2 text-gray-400 hover:hover-primary transition-colors duration-300">Contato</a></li>
           </ul>
           <div>

@@ -78,6 +78,30 @@ describe("PATCH /api/admin/messages/[id]", () => {
 
     expect(res.status).toBe(404);
   });
+
+  it("toggles retentionHold without touching read", async () => {
+    getServerSessionMock.mockResolvedValueOnce({ user: { role: "admin" } });
+    updateMock.mockResolvedValueOnce({ id: MESSAGE_ID, retentionHold: true });
+
+    await PATCH(makeRequest({ retentionHold: true }), makeParams(MESSAGE_ID));
+
+    expect(updateMock).toHaveBeenCalledWith({
+      where: { id: MESSAGE_ID },
+      data: { retentionHold: true },
+    });
+  });
+
+  it("accepts read and retentionHold together in the same request", async () => {
+    getServerSessionMock.mockResolvedValueOnce({ user: { role: "admin" } });
+    updateMock.mockResolvedValueOnce({ id: MESSAGE_ID });
+
+    await PATCH(makeRequest({ read: true, retentionHold: false }), makeParams(MESSAGE_ID));
+
+    expect(updateMock).toHaveBeenCalledWith({
+      where: { id: MESSAGE_ID },
+      data: { read: true, retentionHold: false },
+    });
+  });
 });
 
 describe("DELETE /api/admin/messages/[id]", () => {

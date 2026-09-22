@@ -52,24 +52,59 @@ name/email/message tuple with no foreign key to `User`. Account deletion
 therefore never touches `ContactMessage` rows, and there's nothing to
 anonymize on that side either.
 
-**Retention window:** a contact message is eligible for automatic
-deletion once it is both:
+**Retention flow** (implemented in
+`lib/services/contact-message-retention.ts`):
 
-- marked `read` (i.e., a staff member has already seen and presumably
-  acted on it), and
-- older than `CONTACT_MESSAGE_RETENTION_DAYS` (env var; **default: 180
-  days**).
+```
+ContactMessage
+      │
+      ▼
+Is there a
+retention hold? ──YES──> KEEP IT (never auto-deleted)
+      │
+      NO
+      │
+      ▼
+   read? ──YES──> eligible after CONTACT_MESSAGE_RETENTION_DAYS (default 180d)
+      │
+      NO
+      │
+      ▼
+eligible after CONTACT_MESSAGE_RETENTION_DAYS_UNREAD (default 30d)
+      │
+      ▼
+Daily purge (Vercel Cron → /api/cron/purge-contact-messages)
+```
 
-Unread messages are **never** auto-deleted, regardless of age — nothing
-staff hasn't looked at yet should be able to silently disappear.
+- **Retention hold** (`retentionHold: true`) always wins, regardless of
+  age or read state. It's a manual override an admin sets from
+  `/admin/messages` ("Reter (não purgar)" / "Liberar retenção") for a
+  message that needs to be kept around — e.g. an active dispute. The query
+  filters with `retentionHold: { not: true }` rather than `retentionHold:
+  false`, so messages written before this field existed (and therefore
+  don't have it stored in MongoDB at all) are correctly treated as
+  "not held", not accidentally protected forever.
+- **Read messages** become eligible for deletion once older than
+  `CONTACT_MESSAGE_RETENTION_DAYS` (default: **180 days**).
+- **Unread messages** become eligible once older than
+  `CONTACT_MESSAGE_RETENTION_DAYS_UNREAD` (default: **30 days**) — shorter
+  than read messages, since an unread message this old was never acted on
+  and isn't something staff is likely to come back to.
 
-This is enforced by `scripts/purge-old-contact-messages.ts`
-(`npm run purge:messages`), which is **not** run automatically by the
-app — there's no cron/scheduler built into this codebase. It needs to be
-wired up as a periodic job on whatever platform this is deployed to (e.g.
-a daily/weekly scheduled task). Running it more or less often, or not at
-all, only affects how long read messages linger — it's safe to run at any
-cadence, including manually.
+**Enforcement:** the same `purgeExpiredContactMessages()` function is used
+by two entry points, so there's exactly one place the rules live:
+
+1. `/api/cron/purge-contact-messages` (`GET`) — runs automatically, once a
+   day, via the Vercel Cron job declared in `vercel.json`. Authenticated
+   with Vercel's own `CRON_SECRET` convention (an `Authorization: Bearer
+   <CRON_SECRET>` header Vercel attaches automatically); the endpoint
+   refuses to run if `CRON_SECRET` isn't configured, and rejects any
+   request whose header doesn't match. Hosting somewhere other than
+   Vercel? This route can be called by any external scheduler that can
+   send that header instead.
+2. `scripts/purge-old-contact-messages.ts` (`npm run purge:messages`) —
+   the same logic, for a manual/local run. Safe to run at any time or
+   cadence, including never (the cron job already covers the daily case).
 
 ## Uploaded images (Cloudinary)
 
@@ -101,6 +136,7 @@ whenever it stops being used by anything:
 | Artisan account + products | Self-service account deletion   | Hard delete (User + Products + their Cloudinary assets)      |
 | Admin account               | Superadmin removes it           | Hard delete (User row only — no products/avatar)              |
 | Superadmin account          | —                                | Cannot be self-deleted; manual DB action only                 |
-| Contact message (unread)    | —                                | Never auto-deleted                                            |
-| Contact message (read)      | `purge:messages` script, periodically | Deleted after `CONTACT_MESSAGE_RETENTION_DAYS` (default 180) |
+| Contact message (on retention hold) | —                                | Never auto-deleted                                            |
+| Contact message (read, no hold)     | Daily cron / `purge:messages`    | Deleted after `CONTACT_MESSAGE_RETENTION_DAYS` (default 180)  |
+| Contact message (unread, no hold)   | Daily cron / `purge:messages`    | Deleted after `CONTACT_MESSAGE_RETENTION_DAYS_UNREAD` (default 30) |
 | Cloudinary image            | Removed/replaced/product or account deleted | Deleted from Cloudinary, not just unlinked            |

@@ -58,10 +58,23 @@ model ContactMessage {
   read      Boolean  @default(false)
   createdAt DateTime @default(now())
 
-  // Retention policy (see docs/data-retention-and-deletion.md): read
-  // messages older than CONTACT_MESSAGE_RETENTION_DAYS are purged by
-  // scripts/purge-old-contact-messages.ts. Indexed so that maintenance
-  // query can use it efficiently.
+  // Retention policy (see docs/data-retention-and-deletion.md):
+  //   - retentionHold: true  → never auto-purged, regardless of age/read.
+  //     Set by an admin (e.g. legal/dispute hold) via /admin/messages.
+  //   - otherwise: read messages are purged after
+  //     CONTACT_MESSAGE_RETENTION_DAYS (default 180d); unread messages
+  //     after CONTACT_MESSAGE_RETENTION_DAYS_UNREAD (default 30d).
+  // Enforced by lib/services/contact-message-retention.ts, run daily via
+  // /api/cron/purge-contact-messages (Vercel Cron) and also available as
+  // `npm run purge:messages` for manual/other-host runs.
+  //
+  // Default is `false`, but queries filter with `retentionHold: { not:
+  // true }` rather than `retentionHold: false` — MongoDB documents written
+  // before this field existed don't have it stored at all, and `{ not:
+  // true }` correctly treats "missing" the same as "false" (unheld),
+  // whereas an equality filter would incorrectly exclude them.
+  retentionHold Boolean @default(false)
+
   @@index([read, createdAt])
 }
 

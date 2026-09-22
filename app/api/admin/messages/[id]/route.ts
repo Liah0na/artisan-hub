@@ -19,9 +19,15 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 
   const { id } = await params;
   const body = await request.json().catch(() => null);
-  const read = typeof body?.read === "boolean" ? body.read : true;
+  const data: { read?: boolean; retentionHold?: boolean } = {};
+  if (typeof body?.read === "boolean") data.read = body.read;
+  if (typeof body?.retentionHold === "boolean") data.retentionHold = body.retentionHold;
+  // Preserve the old default: a PATCH with neither field (or a malformed
+  // body) still means "mark as read", same as before this endpoint also
+  // handled retentionHold.
+  if (data.read === undefined && data.retentionHold === undefined) data.read = true;
 
-  const updated = await prisma.contactMessage.update({ where: { id }, data: { read } }).catch(() => null);
+  const updated = await prisma.contactMessage.update({ where: { id }, data }).catch(() => null);
   if (!updated) return NextResponse.json({ error: "Mensagem não encontrada." }, { status: 404 });
 
   return NextResponse.json(updated);

@@ -1,32 +1,26 @@
 /**
  * Maintenance script for item #14 (ContactMessage retention policy — see
- * docs/data-retention-and-deletion.md).
+ * docs/data-retention-and-deletion.md and
+ * lib/services/contact-message-retention.ts for the actual rules).
  *
- * Deletes contact messages that are both:
- *   - marked as read (an admin has already handled them), and
- *   - older than CONTACT_MESSAGE_RETENTION_DAYS (default: 180 days)
+ * This is a thin CLI wrapper: the same logic also runs daily via
+ * /api/cron/purge-contact-messages (Vercel Cron, see vercel.json). Use this
+ * script for a manual run, or if you're hosting somewhere other than
+ * Vercel and need to wire up your own scheduler instead.
  *
- * Unread messages are never auto-deleted, no matter how old, so nothing
- * a staff member hasn't looked at yet can silently disappear.
- *
- * This process has no built-in scheduler — run it periodically via your
- * hosting platform's scheduled jobs / cron (e.g. `npm run purge:messages`
- * once a day or week). It is safe to run repeatedly.
+ * `npm run purge:messages` — safe to run repeatedly, at any cadence.
  */
 import { prisma } from "@/lib/prisma";
-
-const DEFAULT_RETENTION_DAYS = 180;
+import { purgeExpiredContactMessages } from "@/lib/services/contact-message-retention";
 
 async function main() {
-  const retentionDays = Number(process.env.CONTACT_MESSAGE_RETENTION_DAYS) || DEFAULT_RETENTION_DAYS;
-  const cutoff = new Date(Date.now() - retentionDays * 24 * 60 * 60 * 1000);
-
-  const result = await prisma.contactMessage.deleteMany({
-    where: { read: true, createdAt: { lt: cutoff } },
-  });
+  const { deletedCount, readDays, unreadDays, readCutoff, unreadCutoff } =
+    await purgeExpiredContactMessages();
 
   console.log(
-    `[purge-old-contact-messages] Deleted ${result.count} read message(s) older than ${retentionDays} days (before ${cutoff.toISOString()}).`
+    `[purge-old-contact-messages] Deleted ${deletedCount} message(s) not on retention hold: ` +
+      `read & older than ${readDays}d (before ${readCutoff.toISOString()}), ` +
+      `or unread & older than ${unreadDays}d (before ${unreadCutoff.toISOString()}).`
   );
 }
 

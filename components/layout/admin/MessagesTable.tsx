@@ -9,6 +9,7 @@ type ContactMessage = {
   email: string;
   message: string;
   read: boolean;
+  retentionHold: boolean;
   createdAt: string;
 };
 
@@ -16,12 +17,12 @@ export default function MessagesTable({ messages }: { messages: ContactMessage[]
   const router = useRouter();
   const [busyId, setBusyId] = useState<string | null>(null);
 
-  async function toggleRead(id: string, read: boolean) {
+  async function patchMessage(id: string, data: Partial<Pick<ContactMessage, "read" | "retentionHold">>) {
     setBusyId(id);
     await fetch(`/api/admin/messages/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ read }),
+      body: JSON.stringify(data),
     });
     setBusyId(null);
     router.refresh();
@@ -59,6 +60,11 @@ export default function MessagesTable({ messages }: { messages: ContactMessage[]
                     Não lida
                   </span>
                 )}
+                {msg.retentionHold && (
+                  <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700">
+                    Em retenção — não será excluída automaticamente
+                  </span>
+                )}
               </div>
               <a href={`mailto:${msg.email}`} className="text-sm text-gray-500 hover:underline">
                 {msg.email}
@@ -71,14 +77,22 @@ export default function MessagesTable({ messages }: { messages: ContactMessage[]
 
           <p className="mt-3 whitespace-pre-wrap text-sm text-gray-700">{msg.message}</p>
 
-          <div className="mt-4 flex gap-4 text-sm">
+          <div className="mt-4 flex flex-wrap gap-4 text-sm">
             <button
               type="button"
               disabled={busyId === msg.id}
-              onClick={() => toggleRead(msg.id, !msg.read)}
+              onClick={() => patchMessage(msg.id, { read: !msg.read })}
               className="font-medium text-gray-900 underline disabled:opacity-60"
             >
               {msg.read ? "Marcar como não lida" : "Marcar como lida"}
+            </button>
+            <button
+              type="button"
+              disabled={busyId === msg.id}
+              onClick={() => patchMessage(msg.id, { retentionHold: !msg.retentionHold })}
+              className="font-medium text-blue-700 underline disabled:opacity-60"
+            >
+              {msg.retentionHold ? "Liberar retenção" : "Reter (não purgar)"}
             </button>
             <button
               type="button"

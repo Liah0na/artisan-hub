@@ -20,6 +20,7 @@ const MESSAGES = [
     email: "maria@example.com",
     message: "Olá, gostaria de saber mais sobre os produtos.",
     read: false,
+    retentionHold: false,
     createdAt: "2026-01-15T10:00:00.000Z",
   },
   {
@@ -28,6 +29,7 @@ const MESSAGES = [
     email: "joao@example.com",
     message: "Já lida.",
     read: true,
+    retentionHold: false,
     createdAt: "2026-01-10T10:00:00.000Z",
   },
 ];
@@ -104,5 +106,37 @@ describe("MessagesTable", () => {
 
     expect(fetchMock).toHaveBeenCalledWith("/api/admin/messages/m1", { method: "DELETE" });
     await waitFor(() => expect(refreshMock).toHaveBeenCalled());
+  });
+
+  it("shows a retention-hold badge only for held messages", () => {
+    render(<MessagesTable messages={[{ ...MESSAGES[0], retentionHold: true }, MESSAGES[1]]} />);
+
+    expect(screen.getAllByText("Em retenção — não será excluída automaticamente")).toHaveLength(1);
+  });
+
+  it("puts a message on retention hold and refreshes", async () => {
+    const user = userEvent.setup();
+    render(<MessagesTable messages={MESSAGES} />);
+
+    await user.click(screen.getAllByRole("button", { name: "Reter (não purgar)" })[0]);
+
+    expect(fetchMock).toHaveBeenCalledWith("/api/admin/messages/m1", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ retentionHold: true }),
+    });
+    await waitFor(() => expect(refreshMock).toHaveBeenCalled());
+  });
+
+  it("releases a message from retention hold when toggled again", async () => {
+    const user = userEvent.setup();
+    render(<MessagesTable messages={[{ ...MESSAGES[0], retentionHold: true }, MESSAGES[1]]} />);
+
+    await user.click(screen.getByRole("button", { name: "Liberar retenção" }));
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      "/api/admin/messages/m1",
+      expect.objectContaining({ body: JSON.stringify({ retentionHold: false }) })
+    );
   });
 });

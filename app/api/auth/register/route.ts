@@ -65,11 +65,14 @@ export async function POST(request: Request) {
       },
     });
 
-    await sendVerificationEmail(email, token);
+    const emailSent = await sendVerificationEmail(email, token);
 
     return NextResponse.json(
       {
-        message: "Conta criada com sucesso. Verifique seu e-mail para ativar sua conta.",
+        message: emailSent
+          ? "Conta criada com sucesso. Verifique seu e-mail para ativar sua conta."
+          : "Conta criada com sucesso, mas não foi possível enviar o e-mail de confirmação.",
+        emailSent,
         user: {
           id: user.id,
           name: user.name,

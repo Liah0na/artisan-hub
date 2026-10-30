@@ -45,6 +45,7 @@ function validPayload(overrides: Record<string, unknown> = {}) {
 beforeEach(() => {
   vi.clearAllMocks();
   rateLimitMock.mockReturnValue({ success: true, remaining: 4, resetAt: Date.now() + 60_000 });
+  sendVerificationEmailMock.mockResolvedValue(true);
 });
 
 describe("POST /api/auth/register", () => {
@@ -118,6 +119,22 @@ describe("POST /api/auth/register", () => {
     expect(createArgs.data.passwordHash).not.toBe("senha1234");
     expect(createArgs.data.role).toBe("artisan");
     expect(createArgs.data.emailVerified).toBe(false);
+  });
+
+  it("still returns 201 and reports emailSent: false when the email can't be sent", async () => {
+    findUniqueMock.mockResolvedValueOnce(null);
+    createMock.mockResolvedValueOnce({
+      id: "new-user-id",
+      name: "Maria Silva",
+      email: "maria@example.com",
+      role: "artisan",
+    });
+    sendVerificationEmailMock.mockResolvedValueOnce(false);
+
+    const res = await POST(makeRequest(validPayload()));
+
+    expect(res.status).toBe(201);
+    expect((await res.json()).emailSent).toBe(false);
   });
 
   it("returns 500 when an unexpected error occurs", async () => {

@@ -6,7 +6,10 @@ const resend = resendApiKey ? new Resend(resendApiKey) : null;
 const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 const fromAddress = process.env.EMAIL_FROM || "Artisan Hub <onboarding@resend.dev>";
 
-export async function sendVerificationEmail(email: string, token: string) {
+// Resolves to whether the email was handed off for delivery. Never rejects:
+// by the time this runs the account already exists, so callers decide how to
+// answer a failed send instead of surfacing a generic error.
+export async function sendVerificationEmail(email: string, token: string): Promise<boolean> {
   const verifyUrl = `${appUrl}/api/auth/verify-email?token=${token}`;
 
   // Dev / not-yet-configured fallback: log the link instead of failing the
@@ -20,31 +23,42 @@ export async function sendVerificationEmail(email: string, token: string) {
       console.error(
         `[email] RESEND_API_KEY não configurada em produção. Não foi possível enviar o e-mail de verificação para ${email}.`
       );
+      return false;
     } else {
       console.warn(
         `[email] RESEND_API_KEY não configurada. Link de verificação para ${email}:\n${verifyUrl}`
       );
     }
-    return;
+    return true;
   }
 
-  await resend.emails.send({
-    from: fromAddress,
-    to: email,
-    subject: "Confirme seu e-mail — Artisan Hub",
-    html: `
-      <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
-        <h2>Confirme seu e-mail</h2>
-        <p>Obrigado por se cadastrar no Artisan Hub. Clique no botão abaixo para confirmar seu e-mail e ativar sua conta:</p>
-        <p style="margin: 24px 0;">
-          <a href="${verifyUrl}" style="background:#020202;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;display:inline-block;">
-            Confirmar e-mail
-          </a>
-        </p>
-        <p>Ou copie e cole este link no navegador:</p>
-        <p style="word-break: break-all; color: #555;">${verifyUrl}</p>
-        <p style="color: #888; font-size: 13px;">Este link expira em 24 horas. Se você não criou uma conta, pode ignorar este e-mail.</p>
-      </div>
-    `,
-  });
+  try {
+    // The Resend SDK reports API failures in the result instead of rejecting.
+    const { error } = await resend.emails.send({
+      from: fromAddress,
+      to: email,
+      subject: "Confirme seu e-mail — Artisan Hub",
+      html: `
+        <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
+          <h2>Confirme seu e-mail</h2>
+          <p>Obrigado por se cadastrar no Artisan Hub. Clique no botão abaixo para confirmar seu e-mail e ativar sua conta:</p>
+          <p style="margin: 24px 0;">
+            <a href="${verifyUrl}" style="background:#020202;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;display:inline-block;">
+              Confirmar e-mail
+            </a>
+          </p>
+          <p>Ou copie e cole este link no navegador:</p>
+          <p style="word-break: break-all; color: #555;">${verifyUrl}</p>
+          <p style="color: #888; font-size: 13px;">Este link expira em 24 horas. Se você não criou uma conta, pode ignorar este e-mail.</p>
+        </div>
+      `,
+    });
+
+    if (error) throw new Error(`${error.name}: ${error.message}`);
+
+    return true;
+  } catch (error) {
+    console.error(`[email] Falha ao enviar o e-mail de verificação para ${email}:`, error);
+    return false;
+  }
 }

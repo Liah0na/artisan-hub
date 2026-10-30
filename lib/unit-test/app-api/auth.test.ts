@@ -2,11 +2,18 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 
 const findUniqueMock = vi.fn();
 const bcryptCompareMock = vi.fn();
+const consumeLoginAttemptMock = vi.fn();
+const clearLoginAttemptsMock = vi.fn();
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     user: { findUnique: (...args: unknown[]) => findUniqueMock(...args) },
   },
+}));
+
+vi.mock("@/lib/services/login-attempts", () => ({
+  consumeLoginAttempt: (...args: unknown[]) => consumeLoginAttemptMock(...args),
+  clearLoginAttempts: (...args: unknown[]) => clearLoginAttemptsMock(...args),
 }));
 
 vi.mock("bcryptjs", () => ({
@@ -24,7 +31,8 @@ import { authOptions } from "@/lib/utils/auth";
 // internal provider normalization at request time. Reach into `.options` to
 // exercise the actual logic directly.
 type Authorize = (
-  credentials: Record<string, string> | undefined
+  credentials: Record<string, string> | undefined,
+  req?: { headers: Record<string, string> }
 ) => Promise<unknown>;
 const authorize = (
   authOptions.providers[0] as unknown as { options: { authorize: Authorize } }
@@ -32,6 +40,7 @@ const authorize = (
 
 beforeEach(() => {
   vi.clearAllMocks();
+  consumeLoginAttemptMock.mockResolvedValue(true);
 });
 
 describe("authorize()", () => {
@@ -113,6 +122,44 @@ describe("authorize()", () => {
       email: "maria@example.com",
       role: "artisan",
     });
+  });
+});
+
+describe("authorize() brute-force protection", () => {
+  const credentials = { email: "Maria@Example.com", password: "senha123" };
+  const req = { headers: { "x-forwarded-for": "203.0.113.7, 10.0.0.1" } };
+
+  it("rejects before touching the user or password once the limit is reached", async () => {
+    consumeLoginAttemptMock.mockResolvedValueOnce(false);
+
+    await expect(authorize(credentials, req)).rejects.toThrow("TooManyAttempts");
+
+    expect(consumeLoginAttemptMock).toHaveBeenCalledWith("maria@example.com", "203.0.113.7");
+    expect(findUniqueMock).not.toHaveBeenCalled();
+    expect(bcryptCompareMock).not.toHaveBeenCalled();
+  });
+
+  it("keeps a failed attempt counted when the password is wrong", async () => {
+    findUniqueMock.mockResolvedValueOnce({ id: "u1", passwordHash: "hashed" });
+    bcryptCompareMock.mockResolvedValueOnce(false);
+
+    expect(await authorize(credentials, req)).toBeNull();
+
+    expect(clearLoginAttemptsMock).not.toHaveBeenCalled();
+  });
+
+  it("clears the attempts after a correct password", async () => {
+    findUniqueMock.mockResolvedValueOnce({
+      id: "u1",
+      role: "artisan",
+      passwordHash: "hashed",
+      emailVerified: true,
+    });
+    bcryptCompareMock.mockResolvedValueOnce(true);
+
+    await authorize(credentials, req);
+
+    expect(clearLoginAttemptsMock).toHaveBeenCalledWith("maria@example.com", "203.0.113.7");
   });
 });
 

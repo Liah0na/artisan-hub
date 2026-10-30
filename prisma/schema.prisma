@@ -50,6 +50,15 @@ model User {
   @@index([verificationToken])
 }
 
+// Failed-login throttling, see lib/services/login-attempts.ts. The id is a
+// hash of the email or IP being limited. Expired rows are removed by
+// /api/cron/purge-contact-messages.
+model LoginAttempt {
+  id      String   @id @map("_id")
+  count   Int
+  resetAt DateTime
+}
+
 model ContactMessage {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   name      String

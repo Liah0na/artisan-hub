@@ -2,6 +2,8 @@ import { NextAuthOptions } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
+import { getClientIp } from "@/lib/rate-limit";
+import { clearLoginAttempts, consumeLoginAttempt } from "@/lib/services/login-attempts";
 
 export const authOptions: NextAuthOptions = {
   session: {
@@ -13,10 +15,16 @@ export const authOptions: NextAuthOptions = {
         email: {},
         password: {},
       },
-      async authorize(credentials) {
+      async authorize(credentials, req) {
         if (!credentials?.email || !credentials?.password) return null;
 
         const email = String(credentials.email).toLowerCase();
+        const ip = getClientIp({ headers: new Headers(req?.headers) });
+
+        if (!(await consumeLoginAttempt(email, ip))) {
+          throw new Error("TooManyAttempts");
+        }
+
         const user = await prisma.user.findUnique({ where: { email } });
 
         if (!user) return null;
@@ -27,6 +35,8 @@ export const authOptions: NextAuthOptions = {
         );
 
         if (!validPassword) return null;
+
+        await clearLoginAttempts(email, ip);
 
         // Only artisans go through self-signup + email verification. Admins
         // and the superadmin are created directly by a trusted operator

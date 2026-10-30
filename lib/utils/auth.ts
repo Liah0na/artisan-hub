@@ -51,7 +51,21 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.role = user.role;
         token.id = user.id;
+        return token;
       }
+
+      // The JWT outlives any change made to the account, so re-check the
+      // database on every session read: a removed user loses access and a
+      // demoted user loses the old role right away. NextAuth turns this throw
+      // into a null session and clears the cookie where it can write one.
+      const currentUser = await prisma.user.findUnique({
+        where: { id: token.id },
+        select: { role: true },
+      });
+
+      if (!currentUser) throw new Error("SessionUserNotFound");
+
+      token.role = currentUser.role;
       return token;
     },
     async session({ session, token }) {

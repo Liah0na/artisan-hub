@@ -88,7 +88,9 @@ export default function SignupPage() {
       }
 
       setSuccess(
-        "Conta criada com sucesso! Enviamos um link de confirmação para o seu e-mail — verifique sua caixa de entrada para ativar sua conta."
+        data.emailSent === false
+          ? "Conta criada com sucesso, mas não conseguimos enviar o e-mail de confirmação. Tente entrar com seu e-mail e senha para solicitar um novo link."
+          : "Conta criada com sucesso! Enviamos um link de confirmação para o seu e-mail — verifique sua caixa de entrada para ativar sua conta."
       );
 
       setName("");

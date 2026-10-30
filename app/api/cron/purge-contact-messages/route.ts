@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { purgeExpiredContactMessages } from "@/lib/services/contact-message-retention";
+import { purgeExpiredLoginAttempts } from "@/lib/services/login-attempts";
 
 // Daily purge (see docs/data-retention-and-deletion.md and
 // lib/services/contact-message-retention.ts for the actual rules).
@@ -22,6 +23,7 @@ export async function GET(request: Request) {
   }
 
   const result = await purgeExpiredContactMessages();
+  await purgeExpiredLoginAttempts();
 
   return NextResponse.json({
     ok: true,

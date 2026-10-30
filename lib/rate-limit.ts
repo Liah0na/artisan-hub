@@ -74,7 +74,7 @@ export function rateLimit(
  * Falls back to "unknown" so unrelated callers don't accidentally share
  * a rate-limit bucket.
  */
-export function getClientIp(request: Request): string {
+export function getClientIp(request: Pick<Request, "headers">): string {
   const forwardedFor = request.headers.get("x-forwarded-for");
   if (forwardedFor) {
     return forwardedFor.split(",")[0].trim();

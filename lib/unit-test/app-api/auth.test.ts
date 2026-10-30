@@ -13,6 +13,9 @@ vi.mock("bcryptjs", () => ({
   default: { compare: (...args: unknown[]) => bcryptCompareMock(...args) },
 }));
 
+import { getServerSession } from "next-auth";
+import { encode } from "next-auth/jwt";
+
 import { authOptions } from "@/lib/utils/auth";
 
 // NOTE: next-auth v4's Credentials() factory always returns `authorize: () =>
@@ -121,13 +124,64 @@ describe("callbacks.jwt", () => {
     } as never);
 
     expect(token).toMatchObject({ role: "admin", id: "u1" });
+    expect(findUniqueMock).not.toHaveBeenCalled();
   });
 
-  it("leaves an existing token unchanged when there is no user (subsequent requests)", async () => {
+  it("keeps the token as is when the role hasn't changed (subsequent requests)", async () => {
+    findUniqueMock.mockResolvedValueOnce({ role: "admin" });
+
     const existing = { role: "admin", id: "u1" };
     const token = await authOptions.callbacks!.jwt!({ token: existing } as never);
 
-    expect(token).toEqual(existing);
+    expect(token).toEqual({ role: "admin", id: "u1" });
+    expect(findUniqueMock).toHaveBeenCalledWith({
+      where: { id: "u1" },
+      select: { role: true },
+    });
+  });
+
+  it("refreshes the role on the token when the user was demoted", async () => {
+    findUniqueMock.mockResolvedValueOnce({ role: "artisan" });
+
+    const token = await authOptions.callbacks!.jwt!({
+      token: { role: "admin", id: "u1" },
+    } as never);
+
+    expect(token).toMatchObject({ role: "artisan", id: "u1" });
+  });
+
+  it("throws when the user no longer exists", async () => {
+    findUniqueMock.mockResolvedValueOnce(null);
+
+    await expect(
+      authOptions.callbacks!.jwt!({ token: { role: "admin", id: "u1" } } as never)
+    ).rejects.toThrow("SessionUserNotFound");
+  });
+});
+
+describe("getServerSession with an already issued JWT", () => {
+  const secret = "test-secret";
+  const options = { ...authOptions, secret, logger: { error() {}, warn() {}, debug() {} } };
+
+  const sessionFor = async () => {
+    const sessionToken = await encode({ token: { id: "u1", role: "admin" }, secret });
+    const req = { headers: {}, cookies: { "next-auth.session-token": sessionToken } };
+    const res = { getHeader() {}, setHeader() {} };
+    return getServerSession(req as never, res as never, options);
+  };
+
+  it("returns the current role for a demoted user", async () => {
+    findUniqueMock.mockResolvedValueOnce({ role: "artisan" });
+
+    const session = await sessionFor();
+
+    expect(session?.user).toMatchObject({ id: "u1", role: "artisan" });
+  });
+
+  it("returns null for a removed user", async () => {
+    findUniqueMock.mockResolvedValueOnce(null);
+
+    expect(await sessionFor()).toBeNull();
   });
 });
 

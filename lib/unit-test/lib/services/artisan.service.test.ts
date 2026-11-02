@@ -67,7 +67,19 @@ describe("getArtisanById", () => {
 
     await getArtisanById(VALID_ID);
 
-    expect(findUniqueMock).toHaveBeenCalledWith({ where: { id: VALID_ID }, select: PUBLIC_SELECT });
+    expect(findUniqueMock).toHaveBeenCalledWith(
+      expect.objectContaining({ select: PUBLIC_SELECT })
+    );
+  });
+
+  it("only finds verified artisans, so unverified signups and admins have no public profile", async () => {
+    findUniqueMock.mockResolvedValueOnce(null);
+
+    expect(await getArtisanById(VALID_ID)).toBeNull();
+
+    expect(findUniqueMock).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { id: VALID_ID, role: "artisan", emailVerified: true } })
+    );
   });
 
   it("maps a found user to an Artisan (without email), building an avatar URL from its publicId at size 1000", async () => {
@@ -93,13 +105,13 @@ describe("getArtisanById", () => {
 });
 
 describe("getArtisans", () => {
-  it("queries only users with the artisan role, newest first, selecting only public fields", async () => {
+  it("queries only verified artisans, newest first, selecting only public fields", async () => {
     findManyMock.mockResolvedValueOnce([]);
 
     await getArtisans();
 
     expect(findManyMock).toHaveBeenCalledWith({
-      where: { role: "artisan" },
+      where: { role: "artisan", emailVerified: true },
       orderBy: { createdAt: "desc" },
       select: PUBLIC_SELECT,
     });
@@ -111,7 +123,7 @@ describe("getArtisans", () => {
     await getArtisans(5);
 
     expect(findManyMock).toHaveBeenCalledWith({
-      where: { role: "artisan" },
+      where: { role: "artisan", emailVerified: true },
       orderBy: { createdAt: "desc" },
       select: PUBLIC_SELECT,
       take: 5,

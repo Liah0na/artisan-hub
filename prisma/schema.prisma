@@ -50,10 +50,10 @@ model User {
   @@index([verificationToken])
 }
 
-// Failed-login throttling, see lib/services/login-attempts.ts. The id is a
-// hash of the email or IP being limited. Expired rows are removed by
+// Rate-limit counters, see lib/rate-limit.ts. The id is a hash of the key
+// being limited (e.g. `signup:<ip>`). Expired rows are removed by
 // /api/cron/purge-contact-messages.
-model LoginAttempt {
+model RateLimitBucket {
   id      String   @id @map("_id")
   count   Int
   resetAt DateTime

@@ -16,7 +16,7 @@ export async function POST(request: Request) {
 
   try {
     const ip = getClientIp(request);
-    const { success } = rateLimit(`signup:${ip}`, SIGNUP_LIMIT, SIGNUP_WINDOW_MS);
+    const { success } = await rateLimit(`signup:${ip}`, SIGNUP_LIMIT, SIGNUP_WINDOW_MS);
 
     if (!success) {
       return NextResponse.json(

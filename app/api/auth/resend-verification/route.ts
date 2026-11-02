@@ -16,7 +16,7 @@ export async function POST(request: Request) {
   if (!isTrustedOrigin(request)) return originRejectedResponse();
 
   const ip = getClientIp(request);
-  const { success } = rateLimit(`resend-verification:${ip}`, RESEND_LIMIT, RESEND_WINDOW_MS);
+  const { success } = await rateLimit(`resend-verification:${ip}`, RESEND_LIMIT, RESEND_WINDOW_MS);
   if (!success) {
     return NextResponse.json(
       { error: "Muitas tentativas. Tente novamente mais tarde." },

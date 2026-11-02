@@ -19,6 +19,11 @@ const PUBLIC_ARTISAN_SELECT = {
   createdAt: true,
 } as const;
 
+// Only artisans who confirmed their email have a public profile. Unverified
+// signups can't sign in, so their profile is just a name nobody vouched for,
+// and admin accounts are never artisans.
+const PUBLIC_ARTISAN_WHERE = { role: "artisan", emailVerified: true } as const;
+
 type PublicArtisanRecord = {
   id: string;
   name: string;
@@ -46,7 +51,10 @@ function mapArtisan(user: PublicArtisanRecord, avatarSize = 1000): Artisan {
 export async function getArtisanById(id: string): Promise<Artisan | null> {
   if (!OBJECT_ID_RE.test(id)) return null;
 
-  const user = await prisma.user.findUnique({ where: { id }, select: PUBLIC_ARTISAN_SELECT });
+  const user = await prisma.user.findUnique({
+    where: { id, ...PUBLIC_ARTISAN_WHERE },
+    select: PUBLIC_ARTISAN_SELECT,
+  });
   if (!user) return null;
 
   return mapArtisan(user);
@@ -54,7 +62,7 @@ export async function getArtisanById(id: string): Promise<Artisan | null> {
 
 export async function getArtisans(limit?: number): Promise<Artisan[]> {
   const users = await prisma.user.findMany({
-    where: { role: "artisan" },
+    where: PUBLIC_ARTISAN_WHERE,
     orderBy: { createdAt: "desc" },
     select: PUBLIC_ARTISAN_SELECT,
     ...(limit ? { take: limit } : {}),

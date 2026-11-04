@@ -7,6 +7,15 @@
 export const MAX_UPLOAD_BYTES = 4 * 1024 * 1024;
 export const MAX_UPLOAD_LABEL = "4 MB";
 
+/**
+ * Per-user upload quota, shared by the avatar and product-image routes. A
+ * full product is at most 6 images, so this leaves room for several products
+ * (and retries) in an hour while capping how much Cloudinary storage and
+ * bandwidth a single account can burn.
+ */
+export const UPLOAD_RATE_LIMIT = 30;
+export const UPLOAD_RATE_WINDOW_MS = 60 * 60 * 1000;
+
 export function buildCloudinaryUrl(
   src: string,
   size: number = 200,

@@ -2,12 +2,17 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
 const getServerSessionMock = vi.fn();
 const uploadMock = vi.fn();
+const rateLimitMock = vi.fn();
 
 vi.mock("next-auth", () => ({
   getServerSession: (...args: unknown[]) => getServerSessionMock(...args),
 }));
 
 vi.mock("@/auth", () => ({ authOptions: {} }));
+
+vi.mock("@/lib/rate-limit", () => ({
+  rateLimit: (...args: unknown[]) => rateLimitMock(...args),
+}));
 
 vi.mock("@/lib/utils/cloudinary.server", () => ({
   uploadImageBuffer: (...args: unknown[]) => uploadMock(...args),
@@ -35,6 +40,7 @@ function makeImageFile(opts: { type?: string; size?: number } = {}) {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  rateLimitMock.mockResolvedValue({ success: true, remaining: 29, resetAt: Date.now() });
   process.env.CLOUDINARY_CLOUD_NAME = "cloud";
   process.env.CLOUDINARY_API_KEY = "key";
   process.env.CLOUDINARY_API_SECRET = "secret";
@@ -108,5 +114,16 @@ describe("POST /api/dashboard/uploads/avatar", () => {
       expect.any(Buffer),
       expect.objectContaining({ folder: "artisan-hub/avatars/u1" })
     );
+  });
+
+  it("returns 429 once the user's upload quota is used up, before reading the file", async () => {
+    getServerSessionMock.mockResolvedValueOnce({ user: { id: "u1" } });
+    rateLimitMock.mockResolvedValueOnce({ success: false, remaining: 0, resetAt: Date.now() });
+
+    const res = await POST(makeFormRequest(makeImageFile()));
+
+    expect(res.status).toBe(429);
+    expect(rateLimitMock).toHaveBeenCalledWith("upload:u1", 30, 60 * 60 * 1000);
+    expect(uploadMock).not.toHaveBeenCalled();
   });
 });

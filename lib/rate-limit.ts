@@ -19,15 +19,11 @@ type RateLimitResult = {
 
 // Keys are hashed so the collection doesn't hold the IPs or emails they're
 // built from.
-function bucketId(key: string) {
-  return hashToken(key);
-}
+const bucketId = (key: string) => hashToken(key);
 
-function isUniqueConflict(error: unknown) {
-  return (error as { code?: string } | null)?.code === "P2002";
-}
+const isUniqueConflict = (error: unknown) => (error as { code?: string } | null)?.code === "P2002";
 
-async function incrementIfActive(id: string, now: Date) {
+const incrementIfActive = async (id: string, now: Date) => {
   const { count } = await prisma.rateLimitBucket.updateMany({
     where: { id, resetAt: { gt: now } },
     data: { count: { increment: 1 } },
@@ -37,7 +33,7 @@ async function incrementIfActive(id: string, now: Date) {
 
 // Counts one hit and returns the bucket as it stands afterwards. The
 // increment is a single atomic update, so concurrent hits are never lost.
-async function hit(id: string, windowMs: number) {
+const hit = async (id: string, windowMs: number) => {
   const now = new Date();
 
   if (!(await incrementIfActive(id, now))) {

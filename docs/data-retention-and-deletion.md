@@ -129,6 +129,21 @@ whenever it stops being used by anything:
 - an account is deleted (`DELETE` on `/api/dashboard/account`, see
   above).
 
+Images are uploaded *before* the form that uses them is saved, so an
+abandoned form leaves assets that nothing references. A daily cron
+(`/api/cron/purge-orphaned-uploads`, `purgeOrphanedUploads` in
+`lib/services/media.service.ts`) lists everything under
+`artisan-hub/avatars/` and `artisan-hub/products/` and deletes any asset
+that no `Product.images` or `User.avatar` references and that is older
+than 24 hours (so forms still being filled in are left alone). It deletes
+at most 500 assets per run; any backlog is cleared over the following
+days.
+
+Uploads are also rate limited per user — 30 per hour, shared between the
+avatar and product-image routes (`UPLOAD_RATE_LIMIT`,
+`lib/utils/cloudinary.ts`) — so a single account can't exhaust the
+Cloudinary quota.
+
 ## Summary table
 
 | Data                       | Trigger                        | Outcome                                                    |
@@ -140,3 +155,4 @@ whenever it stops being used by anything:
 | Contact message (read, no hold)     | Daily cron / `purge:messages`    | Deleted after `CONTACT_MESSAGE_RETENTION_DAYS` (default 180)  |
 | Contact message (unread, no hold)   | Daily cron / `purge:messages`    | Deleted after `CONTACT_MESSAGE_RETENTION_DAYS_UNREAD` (default 30) |
 | Cloudinary image            | Removed/replaced/product or account deleted | Deleted from Cloudinary, not just unlinked            |
+| Cloudinary image (never saved to a product/profile) | Daily cron | Deleted once older than 24 hours                     |

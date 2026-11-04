@@ -1,3 +1,12 @@
+/**
+ * Upload limits shared by the dashboard forms and the upload API routes.
+ * Uploads are proxied through a Vercel serverless function, whose request
+ * body cap is ~4.5 MB — keep this below that so oversized files get our own
+ * error message instead of a raw 413 from the platform.
+ */
+export const MAX_UPLOAD_BYTES = 4 * 1024 * 1024;
+export const MAX_UPLOAD_LABEL = "4 MB";
+
 export function buildCloudinaryUrl(
   src: string,
   size: number = 200,

@@ -118,16 +118,16 @@ describe("ProductForm — create mode", () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
-  it("rejects an image larger than 5MB", async () => {
+  it("rejects an image larger than 4MB", async () => {
     const user = userEvent.setup({ applyAccept: false });
     render(<ProductForm />);
 
-    const bigFile = new File([new Uint8Array(5 * 1024 * 1024 + 1)], "big.png", {
+    const bigFile = new File([new Uint8Array(4 * 1024 * 1024 + 1)], "big.png", {
       type: "image/png",
     });
     await user.upload(screen.getByLabelText(/Imagens do produto/), bigFile);
 
-    expect(screen.getByText("Cada imagem deve ter no máximo 5 MB.")).toBeInTheDocument();
+    expect(screen.getByText("Cada imagem deve ter no máximo 4 MB.")).toBeInTheDocument();
   });
 
   it("shows the server error when product creation fails", async () => {

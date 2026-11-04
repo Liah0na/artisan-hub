@@ -10,7 +10,7 @@ vi.mock("next-auth", () => ({
 vi.mock("@/auth", () => ({ authOptions: {} }));
 
 vi.mock("@/lib/utils/cloudinary.server", () => ({
-  cloudinary: { uploader: { upload: (...args: unknown[]) => uploadMock(...args) } },
+  uploadImageBuffer: (...args: unknown[]) => uploadMock(...args),
 }));
 
 import { POST } from "@/app/api/dashboard/uploads/product-image/route";
@@ -63,10 +63,10 @@ describe("POST /api/dashboard/uploads/product-image", () => {
     expect(uploadMock).not.toHaveBeenCalled();
   });
 
-  it("returns 400 when the file exceeds 5MB", async () => {
+  it("returns 400 when the file exceeds 4MB", async () => {
     getServerSessionMock.mockResolvedValueOnce({ user: { id: "u1" } });
 
-    const res = await POST(makeFormRequest(makeImageFile({ size: 5 * 1024 * 1024 + 1 })));
+    const res = await POST(makeFormRequest(makeImageFile({ size: 4 * 1024 * 1024 + 1 })));
 
     expect(res.status).toBe(400);
   });
@@ -82,7 +82,7 @@ describe("POST /api/dashboard/uploads/product-image", () => {
 
     expect(res.status).toBe(200);
     expect(uploadMock).toHaveBeenCalledWith(
-      expect.stringContaining("data:image/webp;base64,"),
+      expect.any(Buffer),
       expect.objectContaining({ folder: "artisan-hub/products/u1" })
     );
   });

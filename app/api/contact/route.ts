@@ -30,7 +30,7 @@ export async function POST(request: Request) {
   if (!isTrustedOrigin(request)) return originRejectedResponse();
 
   const ip = getClientIp(request);
-  const { success } = await rateLimit(`contact:${ip}`, CONTACT_LIMIT, CONTACT_WINDOW_MS);
+  const { success } = rateLimit(`contact:${ip}`, CONTACT_LIMIT, CONTACT_WINDOW_MS);
   if (!success) {
     return NextResponse.json(
       { error: "Muitas mensagens enviadas. Tente novamente mais tarde." },

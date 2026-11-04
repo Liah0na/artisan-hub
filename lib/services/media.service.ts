@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { cloudinary, deleteCloudinaryAssets } from "@/lib/utils/cloudinary.server";
+import { deleteCloudinaryAssets } from "@/lib/utils/cloudinary.server";
 
 type ExcludeOptions = {
   // The product currently being edited/deleted. Its own (already
@@ -83,73 +83,4 @@ export async function deleteOrphanedCloudinaryAsset(
   exclude: ExcludeOptions = {}
 ): Promise<void> {
   await deleteOrphanedCloudinaryAssets([publicId], exclude);
-}
-
-// Folders the upload routes write to (`artisan-hub/<kind>/<userId>/...`).
-const UPLOAD_PREFIXES = ["artisan-hub/avatars/", "artisan-hub/products/"];
-
-// Uploads happen before the form is saved, so a fresh asset that nothing
-// references yet is usually just a form still being filled in.
-const ORPHAN_GRACE_MS = 24 * 60 * 60 * 1000;
-
-// Caps the work per run so the cron stays well inside the function timeout;
-// anything left over is picked up the next day.
-const MAX_DELETES_PER_RUN = 500;
-const DELETE_BATCH_SIZE = 100; // Cloudinary's limit per delete_resources call
-
-type CloudinaryResource = { public_id: string; created_at: string };
-
-async function listUploadedAssets(prefix: string): Promise<CloudinaryResource[]> {
-  const assets: CloudinaryResource[] = [];
-  let nextCursor: string | undefined;
-  do {
-    const page = await cloudinary.api.resources({
-      type: "upload",
-      resource_type: "image",
-      prefix,
-      max_results: 500,
-      next_cursor: nextCursor,
-    });
-    assets.push(...(page.resources as CloudinaryResource[]));
-    nextCursor = page.next_cursor;
-  } while (nextCursor);
-  return assets;
-}
-
-async function listReferencedPublicIds(): Promise<Set<string>> {
-  const [products, users] = await Promise.all([
-    prisma.product.findMany({ select: { images: { select: { publicId: true } } } }),
-    prisma.user.findMany({ select: { avatar: { select: { publicId: true } } } }),
-  ]);
-  return new Set([
-    ...products.flatMap((product) => product.images.map((image) => image.publicId)),
-    ...users.flatMap((user) => (user.avatar ? [user.avatar.publicId] : [])),
-  ]);
-}
-
-/**
- * Deletes uploaded images that no product or profile references — e.g. a
- * form that was abandoned after its images were uploaded. Assets younger
- * than the grace period are left alone. Run daily by the cron job.
- *
- * The asset list is read before the database, so an image saved to a
- * product while this runs is seen as referenced rather than deleted.
- */
-export async function purgeOrphanedUploads(now: Date = new Date()) {
-  const cutoff = now.getTime() - ORPHAN_GRACE_MS;
-
-  const assets = (await Promise.all(UPLOAD_PREFIXES.map(listUploadedAssets))).flat();
-  const referenced = await listReferencedPublicIds();
-
-  const orphaned = assets
-    .filter((asset) => new Date(asset.created_at).getTime() < cutoff)
-    .filter((asset) => !referenced.has(asset.public_id))
-    .map((asset) => asset.public_id)
-    .slice(0, MAX_DELETES_PER_RUN);
-
-  for (let i = 0; i < orphaned.length; i += DELETE_BATCH_SIZE) {
-    await cloudinary.api.delete_resources(orphaned.slice(i, i + DELETE_BATCH_SIZE));
-  }
-
-  return { scanned: assets.length, deleted: orphaned.length };
 }

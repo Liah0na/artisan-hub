@@ -10,7 +10,7 @@ vi.mock("next-auth", () => ({
 vi.mock("@/auth", () => ({ authOptions: {} }));
 
 vi.mock("@/lib/utils/cloudinary.server", () => ({
-  cloudinary: { uploader: { upload: (...args: unknown[]) => uploadMock(...args) } },
+  uploadImageBuffer: (...args: unknown[]) => uploadMock(...args),
 }));
 
 import { POST } from "@/app/api/dashboard/uploads/avatar/route";
@@ -81,10 +81,10 @@ describe("POST /api/dashboard/uploads/avatar", () => {
     expect(uploadMock).not.toHaveBeenCalled();
   });
 
-  it("returns 400 when the file exceeds 5MB", async () => {
+  it("returns 400 when the file exceeds 4MB", async () => {
     getServerSessionMock.mockResolvedValueOnce({ user: { id: "u1" } });
 
-    const res = await POST(makeFormRequest(makeImageFile({ size: 5 * 1024 * 1024 + 1 })));
+    const res = await POST(makeFormRequest(makeImageFile({ size: 4 * 1024 * 1024 + 1 })));
 
     expect(res.status).toBe(400);
     expect(uploadMock).not.toHaveBeenCalled();
@@ -105,7 +105,7 @@ describe("POST /api/dashboard/uploads/avatar", () => {
       publicId: "artisan-hub/avatars/u1/xyz",
     });
     expect(uploadMock).toHaveBeenCalledWith(
-      expect.stringContaining("data:image/png;base64,"),
+      expect.any(Buffer),
       expect.objectContaining({ folder: "artisan-hub/avatars/u1" })
     );
   });

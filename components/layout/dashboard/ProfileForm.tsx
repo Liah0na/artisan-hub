@@ -4,7 +4,9 @@ import Image from "next/image";
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024;
+import { MAX_UPLOAD_BYTES, MAX_UPLOAD_LABEL } from "@/lib/utils/cloudinary";
+import { readUploadResponse } from "@/lib/utils/upload-response";
+
 const ACCEPTED_TYPES = /^image\/(jpeg|png|webp)$/;
 
 type Avatar = { url: string; publicId: string } | null;
@@ -50,8 +52,8 @@ export default function ProfileForm({ profile }: ProfileFormProps) {
       setError("Use uma imagem JPG, PNG ou WebP.");
       return;
     }
-    if (file.size > MAX_FILE_SIZE) {
-      setError("A imagem deve ter no máximo 5 MB.");
+    if (file.size > MAX_UPLOAD_BYTES) {
+      setError(`A imagem deve ter no máximo ${MAX_UPLOAD_LABEL}.`);
       return;
     }
 
@@ -83,9 +85,7 @@ export default function ProfileForm({ profile }: ProfileFormProps) {
           method: "POST",
           body: formData,
         });
-        const uploadData = await uploadResponse.json();
-        if (!uploadResponse.ok) throw new Error(uploadData.error || "Não foi possível enviar a foto.");
-        finalAvatar = { url: uploadData.url, publicId: uploadData.publicId };
+        finalAvatar = await readUploadResponse(uploadResponse, "Não foi possível enviar a foto.");
       } else if (avatarRemoved) {
         finalAvatar = null;
       }
@@ -142,7 +142,7 @@ export default function ProfileForm({ profile }: ProfileFormProps) {
             onChange={handleAvatarChange}
             className="text-sm file:mr-3 file:rounded file:border-0 file:bg-gray-100 file:px-3 file:py-1.5 file:text-sm file:font-medium"
           />
-          <p className="mt-1 text-xs text-gray-500">JPG, PNG ou WebP. Máximo de 5 MB.</p>
+          <p className="mt-1 text-xs text-gray-500">JPG, PNG ou WebP. Máximo de {MAX_UPLOAD_LABEL}.</p>
           {canRemove && (
             <button
               type="button"

@@ -1,9 +1,14 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
 const purgeExpiredContactMessagesMock = vi.fn();
+const purgeExpiredRateLimitsMock = vi.fn();
 
 vi.mock("@/lib/services/contact-message-retention", () => ({
   purgeExpiredContactMessages: (...args: unknown[]) => purgeExpiredContactMessagesMock(...args),
+}));
+
+vi.mock("@/lib/rate-limit", () => ({
+  purgeExpiredRateLimits: (...args: unknown[]) => purgeExpiredRateLimitsMock(...args),
 }));
 
 import { GET } from "@/app/api/cron/purge-contact-messages/route";
@@ -33,6 +38,7 @@ describe("GET /api/cron/purge-contact-messages", () => {
 
     expect(res.status).toBe(500);
     expect(purgeExpiredContactMessagesMock).not.toHaveBeenCalled();
+    expect(purgeExpiredRateLimitsMock).not.toHaveBeenCalled();
   });
 
   it("returns 401 with no Authorization header", async () => {

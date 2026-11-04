@@ -16,7 +16,7 @@ export async function POST(request: Request) {
 
   try {
     const ip = getClientIp(request);
-    const { success } = rateLimit(`signup:${ip}`, SIGNUP_LIMIT, SIGNUP_WINDOW_MS);
+    const { success } = await rateLimit(`signup:${ip}`, SIGNUP_LIMIT, SIGNUP_WINDOW_MS);
 
     if (!success) {
       return NextResponse.json(
@@ -65,11 +65,14 @@ export async function POST(request: Request) {
       },
     });
 
-    await sendVerificationEmail(email, token);
+    const emailSent = await sendVerificationEmail(email, token);
 
     return NextResponse.json(
       {
-        message: "Conta criada com sucesso. Verifique seu e-mail para ativar sua conta.",
+        message: emailSent
+          ? "Conta criada com sucesso. Verifique seu e-mail para ativar sua conta."
+          : "Conta criada com sucesso, mas não foi possível enviar o e-mail de confirmação.",
+        emailSent,
         user: {
           id: user.id,
           name: user.name,

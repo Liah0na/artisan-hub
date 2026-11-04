@@ -46,7 +46,7 @@ describe("sendVerificationEmail — RESEND_API_KEY not configured", () => {
     const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     const { sendVerificationEmail } = await importFresh();
 
-    await sendVerificationEmail("maria@example.com", "super-secret-token-456");
+    expect(await sendVerificationEmail("maria@example.com", "super-secret-token-456")).toBe(false);
 
     expect(warnSpy).not.toHaveBeenCalled();
     expect(errorSpy).toHaveBeenCalledTimes(1);
@@ -66,12 +66,45 @@ describe("sendVerificationEmail — RESEND_API_KEY configured", () => {
     sendMock.mockResolvedValueOnce({});
     const { sendVerificationEmail } = await importFresh();
 
-    await sendVerificationEmail("maria@example.com", "token-xyz");
+    expect(await sendVerificationEmail("maria@example.com", "token-xyz")).toBe(true);
 
     expect(sendMock).toHaveBeenCalledWith(
       expect.objectContaining({ to: "maria@example.com" })
     );
     expect(errorSpy).not.toHaveBeenCalled();
+    errorSpy.mockRestore();
+  });
+
+  it("logs and returns false when Resend reports an API error, without logging the token", async () => {
+    process.env.NODE_ENV = "production";
+    process.env.RESEND_API_KEY = "re_test_key";
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    sendMock.mockResolvedValueOnce({
+      data: null,
+      error: { name: "validation_error", message: "Domain not verified" },
+    });
+    const { sendVerificationEmail } = await importFresh();
+
+    expect(await sendVerificationEmail("maria@example.com", "token-xyz")).toBe(false);
+
+    expect(errorSpy).toHaveBeenCalledTimes(1);
+    const logged = errorSpy.mock.calls[0].map(String).join(" ");
+    expect(logged).toContain("maria@example.com");
+    expect(logged).toContain("Domain not verified");
+    expect(logged).not.toContain("token-xyz");
+    errorSpy.mockRestore();
+  });
+
+  it("logs and returns false when the send rejects", async () => {
+    process.env.NODE_ENV = "production";
+    process.env.RESEND_API_KEY = "re_test_key";
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    sendMock.mockRejectedValueOnce(new Error("network down"));
+    const { sendVerificationEmail } = await importFresh();
+
+    expect(await sendVerificationEmail("maria@example.com", "token-xyz")).toBe(false);
+
+    expect(errorSpy).toHaveBeenCalledTimes(1);
     errorSpy.mockRestore();
   });
 });

@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { SubmitEvent, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -18,7 +18,7 @@ export default function SignupPage() {
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
 
     setError("");
@@ -88,7 +88,9 @@ export default function SignupPage() {
       }
 
       setSuccess(
-        "Conta criada com sucesso! Enviamos um link de confirmação para o seu e-mail — verifique sua caixa de entrada para ativar sua conta."
+        data.emailSent === false
+          ? "Conta criada com sucesso, mas não conseguimos enviar o e-mail de confirmação. Tente entrar com seu e-mail e senha para solicitar um novo link."
+          : "Conta criada com sucesso! Enviamos um link de confirmação para o seu e-mail — verifique sua caixa de entrada para ativar sua conta."
       );
 
       setName("");

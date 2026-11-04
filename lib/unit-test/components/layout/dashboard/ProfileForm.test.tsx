@@ -120,16 +120,16 @@ describe("ProfileForm", () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
-  it("rejects an avatar file larger than 5MB without uploading", async () => {
+  it("rejects an avatar file larger than 4MB without uploading", async () => {
     const user = userEvent.setup();
     render(<ProfileForm profile={PROFILE} />);
 
-    const bigFile = new File([new Uint8Array(5 * 1024 * 1024 + 1)], "avatar.png", {
+    const bigFile = new File([new Uint8Array(4 * 1024 * 1024 + 1)], "avatar.png", {
       type: "image/png",
     });
     await user.upload(screen.getByLabelText("Foto de perfil"), bigFile);
 
-    expect(screen.getByText("A imagem deve ter no máximo 5 MB.")).toBeInTheDocument();
+    expect(screen.getByText("A imagem deve ter no máximo 4 MB.")).toBeInTheDocument();
   });
 
   it("shows the server error when saving the profile fails", async () => {

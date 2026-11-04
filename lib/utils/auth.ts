@@ -2,6 +2,8 @@ import { NextAuthOptions } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
+import { getClientIp } from "@/lib/rate-limit";
+import { clearLoginAttempts, consumeLoginAttempt } from "@/lib/services/login-attempts";
 
 export const authOptions: NextAuthOptions = {
   session: {
@@ -13,10 +15,16 @@ export const authOptions: NextAuthOptions = {
         email: {},
         password: {},
       },
-      async authorize(credentials) {
+      async authorize(credentials, req) {
         if (!credentials?.email || !credentials?.password) return null;
 
         const email = String(credentials.email).toLowerCase();
+        const ip = getClientIp({ headers: new Headers(req?.headers) });
+
+        if (!(await consumeLoginAttempt(email, ip))) {
+          throw new Error("TooManyAttempts");
+        }
+
         const user = await prisma.user.findUnique({ where: { email } });
 
         if (!user) return null;
@@ -27,6 +35,8 @@ export const authOptions: NextAuthOptions = {
         );
 
         if (!validPassword) return null;
+
+        await clearLoginAttempts(email, ip);
 
         // Only artisans go through self-signup + email verification. Admins
         // and the superadmin are created directly by a trusted operator
@@ -51,7 +61,21 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.role = user.role;
         token.id = user.id;
+        return token;
       }
+
+      // The JWT outlives any change made to the account, so re-check the
+      // database on every session read: a removed user loses access and a
+      // demoted user loses the old role right away. NextAuth turns this throw
+      // into a null session and clears the cookie where it can write one.
+      const currentUser = await prisma.user.findUnique({
+        where: { id: token.id },
+        select: { role: true },
+      });
+
+      if (!currentUser) throw new Error("SessionUserNotFound");
+
+      token.role = currentUser.role;
       return token;
     },
     async session({ session, token }) {

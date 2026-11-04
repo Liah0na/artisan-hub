@@ -50,6 +50,15 @@ model User {
   @@index([verificationToken])
 }
 
+// Rate-limit counters, see lib/rate-limit.ts. The id is a hash of the key
+// being limited (e.g. `signup:<ip>`). Expired rows are removed by
+// /api/cron/purge-contact-messages.
+model RateLimitBucket {
+  id      String   @id @map("_id")
+  count   Int
+  resetAt DateTime
+}
+
 model ContactMessage {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   name      String

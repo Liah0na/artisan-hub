@@ -142,4 +142,20 @@ describe("POST /api/auth/resend-verification", () => {
     });
     expect(sendVerificationEmailMock).toHaveBeenCalledWith("maria@example.com", "raw-token");
   });
+
+  it("keeps the generic response when the email can't be sent, so failures don't reveal the account", async () => {
+    findUniqueMock.mockResolvedValueOnce({
+      id: "u1",
+      role: "artisan",
+      email: "maria@example.com",
+      emailVerified: false,
+    });
+    updateMock.mockResolvedValueOnce({});
+    sendVerificationEmailMock.mockResolvedValueOnce(false);
+
+    const res = await POST(makeRequest({ email: "maria@example.com" }));
+
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual(GENERIC_BODY);
+  });
 });

@@ -1,4 +1,4 @@
-import { v2 as cloudinary, type UploadApiOptions, type UploadApiResponse } from "cloudinary";
+import { v2 as cloudinary } from "cloudinary";
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -7,23 +7,6 @@ cloudinary.config({
 });
 
 export { cloudinary };
-
-/**
- * Streams a raw buffer to Cloudinary. Avoids building a base64 data URI,
- * which would inflate the payload by ~33% and keep a second copy in memory.
- */
-export function uploadImageBuffer(
-  buffer: Buffer,
-  options: UploadApiOptions
-): Promise<UploadApiResponse> {
-  return new Promise((resolve, reject) => {
-    const stream = cloudinary.uploader.upload_stream(options, (error, result) => {
-      if (error || !result) return reject(error ?? new Error("Empty Cloudinary response"));
-      resolve(result);
-    });
-    stream.end(buffer);
-  });
-}
 
 /**
  * Best-effort delete of a single Cloudinary asset. Failures are logged but

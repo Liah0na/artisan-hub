@@ -71,12 +71,6 @@ function SigninForm() {
         return;
       }
 
-      if (result?.error === "TooManyAttempts") {
-        setError("Muitas tentativas. Aguarde alguns minutos antes de tentar novamente.");
-        setShowResend(false);
-        return;
-      }
-
       if (result?.error) {
         setError("E-mail ou senha inválidos.");
         setShowResend(false);

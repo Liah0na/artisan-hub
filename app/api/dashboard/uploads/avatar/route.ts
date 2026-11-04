@@ -2,18 +2,12 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 
 import { authOptions } from "@/lib/utils/auth";
-import { rateLimit } from "@/lib/rate-limit";
-import {
-  MAX_UPLOAD_BYTES,
-  MAX_UPLOAD_LABEL,
-  UPLOAD_RATE_LIMIT,
-  UPLOAD_RATE_WINDOW_MS,
-} from "@/lib/utils/cloudinary";
-import { uploadImageBuffer } from "@/lib/utils/cloudinary.server";
+import { cloudinary } from "@/lib/utils/cloudinary.server";
 import { isTrustedOrigin, originRejectedResponse } from "@/lib/utils/verify-origin";
 
 export const runtime = "nodejs";
 
+const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const ACCEPTED_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
 
 export async function POST(request: Request) {
@@ -36,20 +30,6 @@ export async function POST(request: Request) {
     );
   }
 
-  // Checked before reading the body so a flood of requests is rejected
-  // cheaply. One bucket per user, shared by both upload routes.
-  const { success } = await rateLimit(
-    `upload:${session.user.id}`,
-    UPLOAD_RATE_LIMIT,
-    UPLOAD_RATE_WINDOW_MS
-  );
-  if (!success) {
-    return NextResponse.json(
-      { error: "Muitos envios de imagem. Tente novamente mais tarde." },
-      { status: 429 }
-    );
-  }
-
   const formData = await request.formData();
   const file = formData.get("file");
 
@@ -64,15 +44,16 @@ export async function POST(request: Request) {
     );
   }
 
-  if (file.size > MAX_UPLOAD_BYTES) {
+  if (file.size > MAX_FILE_SIZE) {
     return NextResponse.json(
-      { error: `A imagem deve ter no máximo ${MAX_UPLOAD_LABEL}.` },
+      { error: "A imagem deve ter no máximo 5 MB." },
       { status: 400 }
     );
   }
 
   const buffer = Buffer.from(await file.arrayBuffer());
-  const upload = await uploadImageBuffer(buffer, {
+  const dataUri = `data:${file.type};base64,${buffer.toString("base64")}`;
+  const upload = await cloudinary.uploader.upload(dataUri, {
     folder: `artisan-hub/avatars/${session.user.id}`,
     resource_type: "image",
     transformation: [{ width: 600, height: 600, crop: "fill", gravity: "face" }],

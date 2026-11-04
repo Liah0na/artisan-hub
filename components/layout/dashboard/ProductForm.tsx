@@ -4,10 +4,8 @@ import Image from "next/image";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
-import { MAX_UPLOAD_BYTES, MAX_UPLOAD_LABEL } from "@/lib/utils/cloudinary";
-import { readUploadResponse } from "@/lib/utils/upload-response";
-
 const MAX_IMAGES = 6;
+const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const ACCEPTED_TYPES = /^image\/(jpeg|png|webp)$/;
 
 type ImageAsset = { url: string; publicId: string };
@@ -65,7 +63,13 @@ export default function ProductForm({ product }: ProductFormProps) {
       method: "POST",
       body: formData,
     });
-    return readUploadResponse(response, "Não foi possível enviar a imagem.");
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "Não foi possível enviar a imagem.");
+    }
+
+    return { url: data.url as string, publicId: data.publicId as string };
   }
 
   function handleFilesChange(event: React.ChangeEvent<HTMLInputElement>) {
@@ -91,8 +95,8 @@ export default function ProductForm({ product }: ProductFormProps) {
         localError = "Use imagens JPG, PNG ou WebP.";
         continue;
       }
-      if (file.size > MAX_UPLOAD_BYTES) {
-        localError = `Cada imagem deve ter no máximo ${MAX_UPLOAD_LABEL}.`;
+      if (file.size > MAX_FILE_SIZE) {
+        localError = "Cada imagem deve ter no máximo 5 MB.";
         continue;
       }
       accepted.push({ key: makeKey(), kind: "new", file, previewUrl: URL.createObjectURL(file) });
@@ -193,7 +197,7 @@ export default function ProductForm({ product }: ProductFormProps) {
           className="w-full rounded-md border px-3 py-2 file:mr-4 file:rounded file:border-0 file:bg-gray-100 file:px-3 file:py-1.5 file:text-sm file:font-medium disabled:opacity-50"
         />
         <p className="mt-2 text-xs text-gray-500">
-          JPG, PNG ou WebP. Máximo de {MAX_UPLOAD_LABEL} por imagem e {MAX_IMAGES} imagens no total. É obrigatório ao menos 1 imagem — a primeira é usada como imagem principal (capa) exibida no catálogo.
+          JPG, PNG ou WebP. Máximo de 5 MB por imagem e {MAX_IMAGES} imagens no total. É obrigatório ao menos 1 imagem — a primeira é usada como imagem principal (capa) exibida no catálogo.
         </p>
 
         {images.length > 0 && (

@@ -3,10 +3,6 @@
     {
       "path": "/api/cron/purge-contact-messages",
       "schedule": "0 3 * * *"
-    },
-    {
-      "path": "/api/cron/purge-orphaned-uploads",
-      "schedule": "30 3 * * *"
     }
   ]
 }

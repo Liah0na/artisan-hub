@@ -2,7 +2,13 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 
 import { authOptions } from "@/lib/utils/auth";
-import { MAX_UPLOAD_BYTES, MAX_UPLOAD_LABEL } from "@/lib/utils/cloudinary";
+import { rateLimit } from "@/lib/rate-limit";
+import {
+  MAX_UPLOAD_BYTES,
+  MAX_UPLOAD_LABEL,
+  UPLOAD_RATE_LIMIT,
+  UPLOAD_RATE_WINDOW_MS,
+} from "@/lib/utils/cloudinary";
 import { uploadImageBuffer } from "@/lib/utils/cloudinary.server";
 import { isTrustedOrigin, originRejectedResponse } from "@/lib/utils/verify-origin";
 
@@ -27,6 +33,20 @@ export async function POST(request: Request) {
     return NextResponse.json(
       { error: "Cloudinary não está configurado no servidor." },
       { status: 500 }
+    );
+  }
+
+  // Checked before reading the body so a flood of requests is rejected
+  // cheaply. One bucket per user, shared by both upload routes.
+  const { success } = await rateLimit(
+    `upload:${session.user.id}`,
+    UPLOAD_RATE_LIMIT,
+    UPLOAD_RATE_WINDOW_MS
+  );
+  if (!success) {
+    return NextResponse.json(
+      { error: "Muitos envios de imagem. Tente novamente mais tarde." },
+      { status: 429 }
     );
   }
 
